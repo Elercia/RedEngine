@@ -1,0 +1,40 @@
+BasedOnStyle: Google
+
+ColumnLimit: 120
+UseTab: Never
+IndentWidth: 4
+AccessModifierOffset: -4
+NamespaceIndentation: Inner
+BreakBeforeBraces: Allman
+
+AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializersBeforeComma: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+PointerAlignment: Left
+AlignConsecutiveAssignments: false
+AlignTrailingComments: true
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: true
+
+#SeparateDefinitionBlocks: Always #clang-format 14
+
+SortIncludes  : true
+IncludeBlocks : Regroup
+IncludeCategories:
+  - Regex:           'RedEngine.*Module\.hpp'
+    Priority:        1
+  - Regex:           'RedEngine'
+    Priority:        2
+  - Regex:           '^<.*\.(?:h|hpp)>'
+    Priority:        3
+  - Regex:           '^<.*>'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        5
+
+SpaceAfterCStyleCast: false
