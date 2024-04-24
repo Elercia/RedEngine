@@ -1,0 +1,21 @@
+[submodule "externals/DebugBreak"]
+	path = externals/DebugBreak
+	url = https://github.com/scottt/debugbreak.git
+[submodule "externals/optick"]
+	path = externals/optick
+	url = https://github.com/bombomby/optick
+[submodule "externals/fmt"]
+	path = externals/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "externals/nlohmann_json"]
+	path = externals/nlohmann_json
+	url = https://github.com/nlohmann/json.git
+[submodule "externals/Box2D"]
+	path = externals/Box2D
+	url = https://github.com/erincatto/box2d.git
+[submodule "externals/imgui"]
+	path = externals/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "externals/glm"]
+	path = externals/glm
+	url = https://github.com/g-truc/glm
