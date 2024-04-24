@@ -1,0 +1,58 @@
+{
+	"entities": [
+		{
+			"children": [
+				{
+					"children": [
+						{
+							"children": [],
+							"components": {
+								"red::Transform": {
+									"Position": "0;0",
+									"Rotation": "0.000000",
+									"Rotation anchor": "0;0",
+									"Scale": "1;1"
+								}
+							},
+							"id": 17596247702267281321,
+							"name": "Test11"
+						}
+					],
+					"components": {
+						"red::Transform": {
+							"Position": "0;0",
+							"Rotation": "0.000000",
+							"Rotation anchor": "0;0",
+							"Scale": "1;1"
+						}
+					},
+					"id": 10864744678482376932,
+					"name": "Test1"
+				}
+			],
+			"components": {
+				"red::Transform": {
+					"Position": "0;10",
+					"Rotation": "0.000000",
+					"Rotation anchor": "0;0",
+					"Scale": "1;1"
+				}
+			},
+			"id": 18441931454589813619,
+			"name": "Test"
+		},
+		{
+			"children": [],
+			"components": {
+				"red::Transform": {
+					"Position": "10;0",
+					"Rotation": "0.000000",
+					"Rotation anchor": "0;0",
+					"Scale": "1;1"
+				}
+			},
+			"id": 13247397297669070847,
+			"name": "Test2"
+		}
+	]
+}
