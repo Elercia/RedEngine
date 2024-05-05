@@ -2,6 +2,7 @@
 
 #include "RedEngine/Core/Configuration/CVar.hpp"
 #include "RedEngine/Core/Configuration/CVarManager.hpp"
+#include "RedEngine/Utils/SystemInfo.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -48,6 +49,8 @@ int main(int argc, char* argv[])
     // your setup ...
 
     red::InitSystemInfo();
+
+    red::SetBreakOnError(false);
 
     int result = Catch::Session().run(argc, argv);
 
