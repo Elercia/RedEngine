@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
 {
     // your setup ...
 
+    red::InitSystemInfo();
+
     int result = Catch::Session().run(argc, argv);
 
     // your clean-up...
