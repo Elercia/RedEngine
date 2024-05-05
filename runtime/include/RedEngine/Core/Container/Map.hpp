@@ -48,6 +48,21 @@ public:
     {
         KeyT first;
         ValueT second;
+
+        ValueT* operator->()
+        {
+            return &second;
+        }
+
+        const ValueT* operator->() const
+        {
+            return &second;
+        }
+
+        const ValueT* operator*() const
+        {
+            return &second;
+        }
     };
 
     using size_type = uint32;
