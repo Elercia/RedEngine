@@ -10,4 +10,17 @@ void LogAssert(const char* filename, int line, const String& s)
 {
     GetRedLogger()->LogInternal(LogLevel::LEVEL_ERROR, line, filename, s);
 }
+
+static bool shouldBreakOnError = true;
+
+bool ShouldBreakOnError()
+{
+    return shouldBreakOnError;
+}
+
+void SetBreakOnError(bool value)
+{
+    shouldBreakOnError = value;
+}
+
 }  // namespace red

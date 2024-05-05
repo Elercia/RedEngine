@@ -65,9 +65,9 @@ red::Logger* GetRedLogger();
 #define RED_LOG_WARNING(MSG, ...) RED_LOG(LogLevel::LEVEL_WARNING, MSG, ##__VA_ARGS__)
 #define RED_LOG_ERROR(MSG, ...)                         \
     RED_LOG(LogLevel::LEVEL_ERROR, MSG, ##__VA_ARGS__); \
-    RedAssert(false)
+    RedError()
 #define RED_LOG_FATAL(MSG, ...)                         \
     RED_LOG(LogLevel::LEVEL_FATAL, MSG, ##__VA_ARGS__); \
-    RedAssert(false)
+    RedError()
 
 #include "inl/Logger.inl"

@@ -6,6 +6,9 @@
 
 namespace red
 {
+bool ShouldBreakOnError();
+void SetBreakOnError(bool value);
+
 void LogAssert(const char* filename, int line, const String& s);
 
 template <typename... Args>
@@ -46,7 +49,7 @@ bool HandleAssert(bool expr, StringView exprStr, const char* filename, int line,
 #define RedAssert(expr, ...)                                                   \
     do                                                                         \
     {                                                                          \
-        if (red::HandleAssert(expr, #expr, __FILE__, __LINE__, ##__VA_ARGS__)) \
+        if (red::HandleAssert(expr, #expr, __FILE__, __LINE__, ##__VA_ARGS__) && ShouldBreakOnError()) \
             debug_break();                                                     \
     } while (0);
 
