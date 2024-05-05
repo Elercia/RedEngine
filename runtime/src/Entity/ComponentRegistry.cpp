@@ -2,13 +2,18 @@
 
 namespace red
 {
-bool ComponentRegistry::RegisterComponent(TypeTraits traits)
+bool ComponentRegistry::RegisterComponent(TypeTraits traits, bool isSingleton, uint32 size,
+    std::function<void(ComponentVoidPtr)> construct,std::function<void(ComponentVoidPtr)> destruct)
 {
     if (m_registeredComponents.find(traits) != m_registeredComponents.end())
         return false;
 
     ComponentMetadata metadata;
     metadata.traits = traits;
+    metadata.isSingleton = isSingleton;
+    metadata.size = size;
+    metadata.construct = construct;
+    metadata.destruct = destruct;
 
     m_registeredComponents.insert({traits, metadata});
 
@@ -35,6 +40,11 @@ const ComponentMetadata* ComponentRegistry::GetRegisteredComponentMetadata(TypeT
         return &it->second;
 
     return nullptr;
+}
+
+const Map<TypeTraits, ComponentMetadata>& red::ComponentRegistry::GetComponentsMetadata() const
+{
+    return m_registeredComponents;
 }
 
 }  // namespace red

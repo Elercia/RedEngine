@@ -9,7 +9,7 @@
 
 namespace red
 {
-EventsComponent::EventsComponent(Entity* entity)
+EventsComponent::EventsComponent(Entity* /*entity*/)
 {
 }
 

@@ -50,6 +50,7 @@
 #include "RedEngine/Entity/System.hpp"
 #include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Entity/ComponentRegistry.hpp"
+#include "RedEngine/Entity/ComponentManager.hpp"
 
 #include "RedEngine/Filesystem/FileSystemModule.hpp"
 #include "RedEngine/Filesystem/File.hpp"
@@ -132,6 +133,7 @@
 #include "Core/Time/Time.cpp"
 
 #include "Entity/ComponentRegistry.cpp"
+#include "Entity/ComponentManager.cpp"
 
 #include "Filesystem/File.cpp"
 #include "Filesystem/Path.cpp"
