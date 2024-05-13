@@ -29,7 +29,7 @@ Array<T, Allocator>::Array() : m_allocator(), m_size(0), m_capacity(0), m_data(n
 template <typename T, typename Allocator>
 Array<T, Allocator>::Array(std::initializer_list<T> list) : m_allocator(), m_size(0), m_capacity(0), m_data(nullptr)
 {
-    reserve((uint32) list.size());
+    reserve((uint32)list.size());
 
     for (auto it = list.begin(); it != list.end(); it++)
         push_back(*it);
@@ -208,7 +208,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::erase(const_iterator
         shift++;
     }
 
-    size_type valueErased = (size_type) (last - first);
+    size_type valueErased = (size_type)(last - first);
 
     m_size -= valueErased;
 
@@ -218,7 +218,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::erase(const_iterator
 template <typename T, typename Allocator>
 typename Array<T, Allocator>::iterator Array<T, Allocator>::erase(iterator first, iterator last)
 {
-    return erase((const_iterator) first, (const_iterator) last);
+    return erase((const_iterator)first, (const_iterator)last);
 }
 
 template <typename T, typename Allocator>
@@ -230,7 +230,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::erase(const_iterator
 template <typename T, typename Allocator>
 typename Array<T, Allocator>::iterator Array<T, Allocator>::erase(iterator pos)
 {
-    return erase((const_iterator) pos);
+    return erase((const_iterator)pos);
 }
 
 template <typename T, typename Allocator>
@@ -280,7 +280,7 @@ void Array<T, Allocator>::SetCapacity(size_type askedCapacity)
         uint32 capacitySize = askedCapacity * sizeof(T);
         if constexpr (std::is_trivial_v<T>)
         {
-            T* tmp = (T*) m_allocator.Realloc(m_data, m_capacity * sizeof(T), capacitySize);
+            T* tmp = (T*)m_allocator.Realloc(m_data, m_capacity * sizeof(T), capacitySize);
 
             if (tmp == NULL)
             {
@@ -291,7 +291,7 @@ void Array<T, Allocator>::SetCapacity(size_type askedCapacity)
         }
         else
         {
-            T* tmp = (T*) m_allocator.Allocate(capacitySize);
+            T* tmp = (T*)m_allocator.Allocate(capacitySize);
 
             if (tmp == NULL)
             {
@@ -301,7 +301,7 @@ void Array<T, Allocator>::SetCapacity(size_type askedCapacity)
             // Copy members from old location to the new one
             for (size_type i = 0; i < m_size; i++)
             {
-                if constexpr ( std::is_move_constructible_v<T>)
+                if constexpr (std::is_move_constructible_v<T>)
                     new (tmp + i) T(std::move(m_data[i]));
                 else
                     new (tmp + i) T(m_data[i]);
@@ -438,10 +438,10 @@ template <class InputIterator>
 typename Array<T, Allocator>::iterator Array<T, Allocator>::insert(const_iterator position, InputIterator first,
                                                                    InputIterator last)
 {
-    const size_type nbElem = (size_type) (last - first);
-    const size_type positionIndex = (size_type) (position - m_data);
+    const size_type nbElem = (size_type)(last - first);
+    const size_type positionIndex = (size_type)(position - m_data);
     if (nbElem == 0)
-        return (iterator) position;
+        return (iterator)position;
 
     RedAssert(position >= begin() && position <= end(), "Position is out of range");
     RedAssert(first < last, "Invalid insertion");
@@ -455,7 +455,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::insert(const_iterato
         {
             if constexpr (std::is_move_constructible_v<T>)
                 new (m_data + i + nbElem) T(std::move(*(m_data + i)));
-            else 
+            else
                 new (m_data + i + nbElem) T(*(m_data + i));
 
             (m_data + i)->~T();
@@ -463,7 +463,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::insert(const_iterato
     }
 
     // copy elements from [first;last] to [position; position+nbElem]
-    iterator itFrom = (iterator) first;
+    iterator itFrom = (iterator)first;
     for (size_type i = 0; i < nbElem; i++)
     {
         new (m_data + i + positionIndex) T(*itFrom);
@@ -473,7 +473,7 @@ typename Array<T, Allocator>::iterator Array<T, Allocator>::insert(const_iterato
 
     m_size += nbElem;
 
-    return (iterator) position;
+    return (iterator)position;
 }
 
 template <typename T, typename Allocator>
@@ -507,7 +507,7 @@ template <typename T, typename Allocator>
 template <typename Predicate>
 typename Array<T, Allocator>::size_type Array<T, Allocator>::FindIf(Predicate&& pred) const
 {
-    for(int i = 0, max = size(); i < max; i++)
+    for (int i = 0, max = size(); i < max; i++)
     {
         const T& elem = at(i);
         if (pred(elem))
@@ -520,7 +520,7 @@ typename Array<T, Allocator>::size_type Array<T, Allocator>::FindIf(Predicate&& 
 #endif  // RED_USE_ARRAY
 
 template <typename T>
-ArrayView<T>::ArrayView() : m_offsetData(nullptr), m_count(0)
+constexpr ArrayView<T>::ArrayView() : m_offsetData(nullptr), m_count(0)
 {
 }
 
@@ -544,49 +544,56 @@ ArrayView<T>::ArrayView(Array<T, A>& ar, size_type count) : m_offsetData(ar.data
 }
 
 template <typename T>
-ArrayView<T>::ArrayView(T* data, size_type count) : m_offsetData(data), m_count(count)
+constexpr ArrayView<T>::ArrayView(T* data, size_type count) : m_offsetData(data), m_count(count)
 {
 }
 
 template <typename T>
-ArrayView<T>::ArrayView(T* data, size_type start, size_type count) : m_offsetData(data + start), m_count(count)
+constexpr ArrayView<T>::ArrayView(T* data, size_type start, size_type count)
+    : m_offsetData(data + start), m_count(count)
 {
 }
 
 template <typename T>
-typename ArrayView<T>::iterator ArrayView<T>::begin()
-{
-    return m_offsetData;
-}
-
-template <typename T>
-typename ArrayView<T>::const_iterator ArrayView<T>::begin() const
+constexpr typename ArrayView<T>::iterator ArrayView<T>::begin()
 {
     return m_offsetData;
 }
 
 template <typename T>
-typename ArrayView<T>::iterator ArrayView<T>::end()
+constexpr typename ArrayView<T>::const_iterator ArrayView<T>::begin() const
+{
+    return m_offsetData;
+}
+
+template <typename T>
+constexpr typename ArrayView<T>::iterator ArrayView<T>::end()
 {
     return m_offsetData + m_count;
 }
 
 template <typename T>
-typename ArrayView<T>::const_iterator ArrayView<T>::end() const
+constexpr typename ArrayView<T>::const_iterator ArrayView<T>::end() const
 {
     return m_offsetData + m_count;
 }
 
 template <typename T>
-typename ArrayView<T>::size_type ArrayView<T>::size() const
+constexpr typename ArrayView<T>::size_type ArrayView<T>::size() const
 {
     return m_count;
 }
 
 template <typename T>
-bool ArrayView<T>::empty() const
+constexpr bool ArrayView<T>::empty() const
 {
     return m_count == 0;
+}
+
+template <typename T>
+constexpr T* ArrayView<T>::data() const
+{
+    return m_offsetData;
 }
 
 template <typename T>
@@ -602,7 +609,7 @@ T& ArrayView<T>::operator[](size_type index)
 }
 
 template <typename T>
-const T& ArrayView<T>::operator[](size_type index) const
+constexpr T& ArrayView<T>::operator[](size_type index) const
 {
     return m_offsetData[index];
 }

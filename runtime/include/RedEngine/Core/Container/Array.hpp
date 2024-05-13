@@ -146,7 +146,7 @@ class ArrayView
     using const_iterator = const T*;
 
 public:
-    ArrayView();
+    constexpr ArrayView();
 
     template <typename A>
     explicit ArrayView(Array<T, A>& ar);
@@ -157,21 +157,22 @@ public:
     template <typename A>
     ArrayView(Array<T, A>& ar, size_type count);
 
-    ArrayView(T* data, size_type count);
-    ArrayView(T* data, size_type start, size_type count);
+    constexpr ArrayView(T* data, size_type count);
+    constexpr ArrayView(T* data, size_type start, size_type count);
 
-    iterator begin();
-    const_iterator begin() const;
+    constexpr iterator begin();
+    constexpr const_iterator begin() const;
 
-    iterator end();
-    const_iterator end() const;
+    constexpr iterator end();
+    constexpr const_iterator end() const;
 
-    bool empty() const;
-    size_type size() const;
+    constexpr bool empty() const;
+    constexpr size_type size() const;
     T* data();
+    constexpr T* data() const;
 
     T& operator[](size_type index);
-    const T& operator[](size_type index) const;
+    constexpr T& operator[](size_type index) const;
 
 private:
     T* m_offsetData;
