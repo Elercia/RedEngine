@@ -17,12 +17,12 @@ struct TypeTraits
     bool triviallyConstructible;
     bool triviallyDestructible;
 
-    bool operator==(const TypeTraits& other) const
+    constexpr bool operator==(const TypeTraits& other) const
     {
         return other.typeId == typeId;
     }
 
-    bool operator!=(const TypeTraits& other) const
+    constexpr bool operator!=(const TypeTraits& other) const
     {
         return other.typeId != typeId;
     }
