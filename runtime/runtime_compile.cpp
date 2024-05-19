@@ -2,6 +2,7 @@
 #include "RedEngine/Audio/AudioModule.hpp"
 #include "RedEngine/Audio/AudioEvent.hpp"
 #include "RedEngine/Audio/AudioUtils.hpp"
+#include "RedEngine/Audio/Component/AudioSubSystem.hpp"
 #include "RedEngine/Audio/Component/AudioListener.hpp"
 #include "RedEngine/Audio/Component/AudioSource.hpp"
 #include "RedEngine/Audio/Resource/SoundResource.hpp"
@@ -47,6 +48,7 @@
 #include "RedEngine/Core/Time/Time.hpp"
 
 #include "RedEngine/Entity/Entity.hpp"
+#include "RedEngine/Entity/SystemQuery.hpp"
 #include "RedEngine/Entity/System.hpp"
 #include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Entity/ComponentRegistry.hpp"
