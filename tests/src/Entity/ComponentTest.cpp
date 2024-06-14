@@ -58,11 +58,48 @@ struct ConstructDestructComp
 int ConstructDestructComp::nbConstruction = 0;
 int ConstructDestructComp::nbDestruction = 0;
 
+struct ConstructDestructCompSingleton
+{
+    static int nbConstruction;
+    static int nbDestruction;
+    static void ResetCounters()
+    {
+        nbConstruction = 0;
+        nbDestruction = 0;
+    }
+
+    ConstructDestructCompSingleton()
+    {
+        nbConstruction++;
+    }
+
+    ~ConstructDestructCompSingleton()
+    {
+        nbDestruction++;
+    }
+};
+
+int ConstructDestructCompSingleton::nbConstruction = 0;
+int ConstructDestructCompSingleton::nbDestruction = 0;
+
+struct SingletonComp
+{
+    SingletonComp()
+    {
+        a.x = 10.f;
+        a.y = 100.f;
+    }
+    Vector2 a;
+};
+
+RED_DECLARE_SINGLETON_COMPONENT(ConstructDestructCompSingleton)
+RED_DECLARE_SINGLETON_COMPONENT(SingletonComp)
+
 TEST_CASE("Register components", "[ECS]")
 {
     ComponentRegistry registry;
 
-    REQUIRE(registry.RegisterComponent<TestComponent>(false));
+    REQUIRE(registry.RegisterComponent<TestComponent>());
 
     SECTION("Get metadata from template")
     {
@@ -95,7 +132,7 @@ TEST_CASE("Create component", "[ECS]")
 
     EntityId entity = 1;
 
-    REQUIRE(registry.RegisterComponent<TestComponent>(false));
+    REQUIRE(registry.RegisterComponent<TestComponent>());
 
     manager.Init();
 
@@ -132,8 +169,8 @@ TEST_CASE("Get components", "[ECS]")
     ComponentRegistry registry;
     ComponentManager manager(&registry);
 
-    REQUIRE(registry.RegisterComponent<TestComponent>(false));
-    REQUIRE(registry.RegisterComponent<TestComponent2>(false));
+    REQUIRE(registry.RegisterComponent<TestComponent>());
+    REQUIRE(registry.RegisterComponent<TestComponent2>());
 
     EntityId entity1 = 1;
     EntityId entity2 = 2;
@@ -186,11 +223,11 @@ TEST_CASE("Singleton components", "[ECS]")
     ComponentRegistry registry;
     ComponentManager manager(&registry);
 
-    REQUIRE(registry.RegisterComponent<TestComponent>(true));
+    REQUIRE(registry.RegisterComponent<SingletonComp>());
 
     manager.Init();
 
-    auto comp = manager.GetSingletonComponent<TestComponent>();
+    auto comp = manager.GetSingletonComponent<SingletonComp>();
     REQUIRE(comp != nullptr);
     REQUIRE(comp->a.x == 10.f);
     REQUIRE(comp->a.y == 100.f);
@@ -200,26 +237,26 @@ TEST_CASE("Singleton components", "[ECS]")
 
 TEST_CASE("Singleton components construct destruct", "[ECS]")
 {
-    ConstructDestructComp::ResetCounters();
+    ConstructDestructCompSingleton::ResetCounters();
 
     ComponentRegistry registry;
     ComponentManager manager(&registry);
 
-    REQUIRE(registry.RegisterComponent<ConstructDestructComp>(true));
+    REQUIRE(registry.RegisterComponent<ConstructDestructCompSingleton>());
 
     manager.Init();
 
-    REQUIRE(ConstructDestructComp::nbConstruction == 1);
+    REQUIRE(ConstructDestructCompSingleton::nbConstruction == 1);
 
-    auto comp = manager.GetSingletonComponent<ConstructDestructComp>();
+    auto comp = manager.GetSingletonComponent<ConstructDestructCompSingleton>();
     REQUIRE(comp != nullptr);
-    REQUIRE(ConstructDestructComp::nbConstruction == 1);
-    REQUIRE(ConstructDestructComp::nbDestruction == 0);
+    REQUIRE(ConstructDestructCompSingleton::nbConstruction == 1);
+    REQUIRE(ConstructDestructCompSingleton::nbDestruction == 0);
 
     manager.Finalize();
 
-    REQUIRE(ConstructDestructComp::nbConstruction == 1);
-    REQUIRE(ConstructDestructComp::nbDestruction == 1);
+    REQUIRE(ConstructDestructCompSingleton::nbConstruction == 1);
+    REQUIRE(ConstructDestructCompSingleton::nbDestruction == 1);
 }
 
 TEST_CASE("Components construct destruct", "[ECS]")
@@ -229,7 +266,7 @@ TEST_CASE("Components construct destruct", "[ECS]")
     ComponentRegistry registry;
     ComponentManager manager(&registry);
 
-    REQUIRE(registry.RegisterComponent<ConstructDestructComp>(false));
+    REQUIRE(registry.RegisterComponent<ConstructDestructComp>());
 
     manager.Init();
     REQUIRE(ConstructDestructComp::nbConstruction == 0);

@@ -7,6 +7,19 @@ namespace red
 {
 using ComponentVoidPtr = void*;
 
+template <typename COMP>
+struct ComponentTraits
+{
+    static constexpr bool IsSingleton = false;
+};
+
+#define RED_DECLARE_SINGLETON_COMPONENT(COMP)     \
+    template <>                                   \
+    struct ComponentTraits<COMP>                  \
+    {                                             \
+        static constexpr bool IsSingleton = true; \
+    };
+
 struct ComponentMetadata
 {
     TypeTraits traits;
@@ -20,7 +33,7 @@ class ComponentRegistry
 {
 public:
     template <typename COMP>
-    bool RegisterComponent(bool isSingleton);
+    bool RegisterComponent();
 
     bool RegisterComponent(TypeTraits traits, bool isSingleton, uint32 size,
                            std::function<void(ComponentVoidPtr)> construct,

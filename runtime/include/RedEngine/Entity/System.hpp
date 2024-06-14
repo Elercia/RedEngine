@@ -7,15 +7,35 @@
 
 namespace red
 {
+class World;
+
+// TODO Query ?
+class SystemInitializer
+{
+public:
+    virtual void Init() = 0;
+    virtual void Finalize() = 0;
+
+    World* m_world;
+    TypeTraits m_traits;
+};
+
+class BaseSystem
+{
+public:
+    virtual void Update() = 0;
+
+    World* m_world;
+    TypeTraits m_traits;
+};
 
 template <typename QueryType>
-struct System
+class System : public BaseSystem
 {
-    static_assert(std::is_base_of<Query, QueryType>::value, "Not a query type");
+public:
+    static_assert(std::is_base_of<BaseQuery, QueryType>::value, "Not a query type");
 
-    virtual void Init(){};
-    virtual void Finalize(){};
-    virtual void Update(){};
+    QueryType m_query;
 };
 }  // namespace red
 #include "inl/System.inl"

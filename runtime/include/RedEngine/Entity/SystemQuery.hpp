@@ -1,6 +1,8 @@
 #pragma once
 
+#include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Entity/Entity.hpp"
+#include "RedEngine/Entity/World.hpp"
 #include "RedEngine/Utils/Tuple.hpp"
 #include "RedEngine/Utils/TypesInfo.hpp"
 
@@ -11,6 +13,9 @@ struct ComponentQuery
 {
 };
 // Internal use only
+struct IncludeInQueryResultCompQuery
+{
+};
 struct IncludeCompQuery
 {
 };
@@ -44,7 +49,7 @@ struct Excluding : ComponentQuery, ExcludeCompQuery
 
 // Query Writing require the entity to have the COMP component with write access right
 template <typename COMP>
-struct Writing : public Including<COMP>, WriteCompQuery
+struct Writing : public Including<COMP>, WriteCompQuery, IncludeInQueryResultCompQuery
 {
     static const bool WRITING = true;
     using Type = COMP;
@@ -52,7 +57,7 @@ struct Writing : public Including<COMP>, WriteCompQuery
 
 // Query Reading require the entity to have the COMP component with read access right
 template <typename COMP>
-struct Reading : public Including<COMP>, ReadCompQuery
+struct Reading : public Including<COMP>, ReadCompQuery, IncludeInQueryResultCompQuery
 {
     static const bool WRITING = false;
     using Type = COMP;
@@ -112,14 +117,16 @@ constexpr static int GetExcludeQueryCount()
     return CountQueryType(t, noop);
 }
 
-template <typename FilterType, typename... QueriesTypes>
+template <typename FilterType, bool IncludeSingletons, typename... QueriesTypes>
 constexpr auto FilterComponentTypeTraits()
 {
     return std::apply(
         [](auto... ts)
         {
-            return std::tuple_cat(std::conditional_t<std::is_base_of<FilterType, std::decay<decltype(ts)>::type>::value,
-                                                     Tuple<std::decay<decltype(ts)>::type>, Tuple<>>{}...);
+            return std::tuple_cat(
+                std::conditional_t < std::is_base_of<FilterType, std::decay<decltype(ts)>::type>::value &&
+                    (IncludeSingletons || ComponentTraits<std::decay<decltype(ts)>::type::Type>::IsSingleton == false),
+                Tuple<std::decay<decltype(ts)>::type>, Tuple < >> {}...);
         },
         std::tuple<QueriesTypes...>());
 }
@@ -128,16 +135,49 @@ template <typename FilterType, typename... QueriesTypes>
 constexpr auto FetchComponentTypeTraits()
 {
     return std::apply([](auto&&... x) { return std::array{TypeInfo<std::decay<decltype(x)>::type::Type>()...}; },
-                      FilterComponentTypeTraits<FilterType, QueriesTypes...>());
+                      FilterComponentTypeTraits<FilterType, true, QueriesTypes...>());
 }
 
 template <typename... QueriesTypes>
-constexpr auto GetRequireComponentTypeTuple()
+constexpr auto GetIncludedComponentTypeTuple()
 {
-    return std::tuple_cat(
-        Tuple<EntityId>(),
-        std::apply([](auto&&... x) { return Tuple<std::add_pointer<std::decay<decltype(x)>::type::Type>::type...>(); },
-                   FilterComponentTypeTraits<IncludeCompQuery, QueriesTypes...>()));
+    return std::tuple_cat(Tuple<EntityId>(),
+                          std::apply(
+                              [](auto&&... compQuery)
+                              {
+                                  return Tuple<std::conditional_t<
+                                      std::is_base_of_v<ReadCompQuery, std::decay<decltype(compQuery)>::type>,
+                                      std::add_pointer_t<std::add_const_t<std::decay<decltype(compQuery)>::type::Type>>,
+                                      std::add_pointer<std::decay<decltype(compQuery)>::type::Type>::type>...>();
+                              },
+                              FilterComponentTypeTraits<IncludeInQueryResultCompQuery, false, QueriesTypes...>()));
+}
+
+template <typename... QueriesTypes>
+constexpr auto FilterSingletonTypeTraits()
+{
+    return std::apply(
+        [](auto... compQuery)
+        {
+            return std::tuple_cat(
+                std::conditional_t<ComponentTraits<std::decay<decltype(compQuery)>::type::Type>::IsSingleton,
+                                   Tuple<std::decay<decltype(compQuery)>::type>, Tuple<>>{}...);
+        },
+        std::tuple<QueriesTypes...>());
+}
+
+template <typename... QueriesTypes>
+constexpr auto GetQuerySingletonComponent()
+{
+    return std::apply(
+        [](auto&&... compQuery)
+        {
+            return Tuple<
+                std::conditional_t<std::is_base_of_v<ReadCompQuery, std::decay<decltype(compQuery)>::type>,
+                                   std::add_pointer_t<std::add_const_t<std::decay<decltype(compQuery)>::type::Type>>,
+                                   std::add_pointer<std::decay<decltype(compQuery)>::type::Type>::type>...>();
+        },
+        FilterSingletonTypeTraits<QueriesTypes...>());
 }
 
 template <typename... QueriesTypes>
@@ -265,18 +305,40 @@ struct QueryWithoutExcludeComponents
     }
 };
 
+struct BaseQuery
+{
+};
+
 template <typename... QueriesTypes>
-struct Query : std::conditional<GetWritingQueryCount<QueriesTypes...>() == 0, QueryWithoutWriteComponents,
-                                QueryWithWriteComponents<QueriesTypes...>>::type,
-               std::conditional<GetReadingQueryCount<QueriesTypes...>() == 0, QueryWithoutReadComponents,
-                                QueryWithReadComponents<QueriesTypes...>>::type,
-               std::conditional<GetIncludeQueryCount<QueriesTypes...>() == 0, QueryWithoutIncludeComponents,
-                                QueryWithIncludeComponents<QueriesTypes...>>::type,
-               std::conditional<GetExcludeQueryCount<QueriesTypes...>() == 0, QueryWithoutExcludeComponents,
-                                QueryWithExcludeComponents<QueriesTypes...>>::type
+struct Query : public BaseQuery,
+               public std::conditional<GetWritingQueryCount<QueriesTypes...>() == 0, QueryWithoutWriteComponents,
+                                       QueryWithWriteComponents<QueriesTypes...>>::type,
+               public std::conditional<GetReadingQueryCount<QueriesTypes...>() == 0, QueryWithoutReadComponents,
+                                       QueryWithReadComponents<QueriesTypes...>>::type,
+               public std::conditional<GetIncludeQueryCount<QueriesTypes...>() == 0, QueryWithoutIncludeComponents,
+                                       QueryWithIncludeComponents<QueriesTypes...>>::type,
+               public std::conditional<GetExcludeQueryCount<QueriesTypes...>() == 0, QueryWithoutExcludeComponents,
+                                       QueryWithExcludeComponents<QueriesTypes...>>::type
 {
     static_assert(sizeof...(QueriesTypes) > 0, "You should have a least one component inside a query !");
     static_assert(all_true<std::is_base_of<ComponentQuery, QueriesTypes>::value...>::value,
                   "System query made of something else than a component query type");
+
+    using QueriedSingletonsTuple = decltype(GetQuerySingletonComponent<QueriesTypes...>());
+
+    QueriedSingletonsTuple GetSingletonComponents()
+    {
+        QueriedSingletonsTuple singletons;
+        m_world->QuerySingletons(singletons);
+
+        return singletons;
+    }
+
+    Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())> GetEntitiesComponents()
+    {
+        return Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())>();
+    }
+
+    World* m_world;
 };
 }  // namespace red

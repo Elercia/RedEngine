@@ -32,6 +32,9 @@ void ComponentManager::RemoveComponent(EntityId entityId)
 template <typename SINGL>
 inline SINGL* ComponentManager::GetSingletonComponent()
 {
+    static_assert(std::is_pointer_v<SINGL> == false && std::is_const_v<SINGL> == false &&
+                  std::is_reference_v<SINGL> == false);
+
     auto typeTraits = TypeInfo<SINGL>();
 
     auto it = m_singletons.find(typeTraits);

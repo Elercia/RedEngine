@@ -7,5 +7,6 @@ namespace red
 struct Transform2D
 {
     Vector2 localPosition;
+    float localRotationRad;
 };
 } // namespace red
