@@ -7,12 +7,10 @@
 
 namespace red
 {
-class EventSystem : public System /*<SinglQuery<QueryRW<EventsComponent>>>*/
+using EventSystemQuery = Query<Writing<EventsComponent>>;
+class EventSystem : public System<EventSystemQuery>
 {
 public:
-    virtual ~EventSystem() = default;
-
-    virtual void Init() override;
     virtual void Update() override;
 };
 }  // namespace red

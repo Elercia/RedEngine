@@ -90,6 +90,7 @@ public:
     const Map<ColliderId, Collider>& GetColliders() const;
 
     b2Body* GetBody();
+    const b2Body* GetBody()const ;
     void SetBody(b2Body* body);
 
     OnTriggerSignalType m_triggerSignal;

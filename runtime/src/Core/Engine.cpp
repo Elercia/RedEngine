@@ -154,13 +154,12 @@ bool Engine::Create()
 {
     PROFILER_EVENT();
 
+    InitSystemInfo();
+    InitRandomEngine(42);
+
     CVarManager::LoadConfigFile(Path::Resource("Config.ini"));
 
     SetupLogger();
-
-    InitSystemInfo();
-
-    InitRandomEngine(42);
 
     m_scheduler.Init();
 

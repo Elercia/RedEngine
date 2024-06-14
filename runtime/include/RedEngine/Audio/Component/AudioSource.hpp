@@ -23,12 +23,6 @@ struct AudioSource
     void UnPause();
     void Loop(int loopCount = -1);
 
-    std::shared_ptr<SoundResource> GetResource()
-    {
-        return m_sound;
-    }
-
-private:
     SoundDesc m_desc;
 
     std::shared_ptr<SoundResource> m_sound = nullptr;

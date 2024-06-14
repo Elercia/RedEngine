@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 
 #include "box2d/b2_world_callbacks.h"
@@ -9,13 +10,14 @@ class b2World;
 namespace red
 {
 class PhysicsDebugDrawer;
+struct ContactListener;
 
 float ConvertToPhysicsDistance(float f);
 float ConvertFromPhysicsDistance(float f);
 b2Vec2 ConvertToPhysicsVector(const Vector2& vector2);
 Vector2 ConvertFromPhysicsVector(const b2Vec2& vector2);
 
-class PhysicsWorld : public b2ContactListener
+class PhysicsWorld 
 {
 public:
     PhysicsWorld();
@@ -37,9 +39,6 @@ public:
     void SetDebugDrawer(PhysicsDebugDrawer* drawer);
     void DrawDebug();
 
-    void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
-
-private:
     void ClearContactInfo();
     void AddTriggerContact(PhysicBody* physicBody1, PhysicBody* physicBody2, Collider* collider1, Collider* collider2);
     void AddCollisionContact(PhysicBody* physicBody1, PhysicBody* physicBody2, Collider* collider1, Collider* collider2,
@@ -47,8 +46,11 @@ private:
 
 private:
     b2World* m_internalPhysicsWorld;
+    ContactListener* m_contactListener;
 
     Array<CollisionInfo> m_frameCollisionInfo;
     Array<TriggerInfo> m_frameTriggerInfo;
 };
+
+RED_DECLARE_SINGLETON_COMPONENT(PhysicsWorld);
 }  // namespace red

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RedEngine/Core/Event/Signal.hpp"
+#include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Entity/Entity.hpp"
 #include "RedEngine/Input/InputDefinition.hpp"
 #include "RedEngine/Math/Vector.hpp"
@@ -36,4 +37,6 @@ private:
 
     std::array<KeyState, KeyCodes::MAX> m_keyStates;
 };
+RED_DECLARE_SINGLETON_COMPONENT(EventsComponent);
+
 }  // namespace red

@@ -1,4 +1,4 @@
-#include "RedEngine/Physics/PhysicsWorld.hpp"
+#include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 
 #include "RedEngine/Physics/PhysicsModule.hpp"
 
@@ -14,6 +14,35 @@ namespace red
 {
 constexpr float s_physicDistanceFactor = 0.01f;
 // constexpr float s_physicDistanceFactor = 1.f;
+
+struct ContactListener : public b2ContactListener
+{
+    PhysicsWorld* world;
+    void PreSolve(b2Contact* contact, const b2Manifold* /*oldManifold*/) override
+    {
+        const auto* manifold = contact->GetManifold();
+
+        if (manifold->pointCount == 0)
+        {
+            return;
+        }
+
+        auto* physicBody1 = reinterpret_cast<PhysicBody*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+        auto* physicBody2 = reinterpret_cast<PhysicBody*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+
+        auto* collider1 = reinterpret_cast<Collider*>(contact->GetFixtureA()->GetUserData().pointer);
+        auto* collider2 = reinterpret_cast<Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+
+        if (collider1->IsTrigger() || collider2->IsTrigger())
+        {
+            world->AddTriggerContact(physicBody1, physicBody2, collider1, collider2);
+        }
+        else
+        {
+            world->AddCollisionContact(physicBody1, physicBody2, collider1, collider2, contact);
+        }
+    }
+};
 
 float ConvertToPhysicsDistance(float f)
 {
@@ -35,14 +64,17 @@ Vector2 ConvertFromPhysicsVector(const b2Vec2& vector2)
     return Vector2(vector2.x, vector2.y) * (1.f / s_physicDistanceFactor);
 }
 
-PhysicsWorld::PhysicsWorld() : m_internalPhysicsWorld(new b2World({0.f, 0.f}))
+PhysicsWorld::PhysicsWorld() : m_internalPhysicsWorld(new b2World({0.f, 0.f})), m_contactListener(nullptr)
 {
-    m_internalPhysicsWorld->SetContactListener(this);
+    m_contactListener = red_new(ContactListener);
+    m_contactListener->world = this;
+    m_internalPhysicsWorld->SetContactListener(m_contactListener);
 }
 
 PhysicsWorld::~PhysicsWorld()
 {
     RED_SAFE_DELETE(m_internalPhysicsWorld);
+    red_delete(m_contactListener);
 }
 
 void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreationDesc& creationDesc)
@@ -50,7 +82,7 @@ void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreat
     b2BodyDef bodyDef;
 
     b2BodyUserData userData;
-    userData.pointer = (uintptr_t) physicBody;
+    userData.pointer = (uintptr_t)physicBody;
     bodyDef.userData = userData;
     bodyDef.allowSleep = false;
 
@@ -111,31 +143,6 @@ void PhysicsWorld::SetDebugDrawer(PhysicsDebugDrawer* drawer)
 void PhysicsWorld::DrawDebug()
 {
     m_internalPhysicsWorld->DebugDraw();
-}
-
-void PhysicsWorld::PreSolve(b2Contact* contact, const b2Manifold* /*oldManifold*/)
-{
-    const auto* manifold = contact->GetManifold();
-
-    if (manifold->pointCount == 0)
-    {
-        return;
-    }
-
-    auto* physicBody1 = reinterpret_cast<PhysicBody*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-    auto* physicBody2 = reinterpret_cast<PhysicBody*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
-
-    auto* collider1 = reinterpret_cast<Collider*>(contact->GetFixtureA()->GetUserData().pointer);
-    auto* collider2 = reinterpret_cast<Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-
-    if (collider1->IsTrigger() || collider2->IsTrigger())
-    {
-        AddTriggerContact(physicBody1, physicBody2, collider1, collider2);
-    }
-    else
-    {
-        AddCollisionContact(physicBody1, physicBody2, collider1, collider2, contact);
-    }
 }
 
 void PhysicsWorld::ClearContactInfo()

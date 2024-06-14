@@ -8,54 +8,8 @@
 
 namespace red
 {
-DebugComponent::DebugComponent() : m_lineShaderProgram(nullptr), m_physicsDebugDrawer(nullptr)
+DebugComponent::DebugComponent() : m_physicsDebugDrawer(nullptr)
 {
-    /*m_lineShaderProgram = m_owner->GetWorld()
-                              ->GetWorldComponent<ResourceHolderComponent>()
-                              ->GetResourceLoader<ShaderProgramResourceLoader>()
-                              ->LoadResource(Path::Resource("ENGINE_RESOURCES/LINE_SHADER_PROGRAM"));*/
-}
-
-// TODO Add solid debug draw
-
-void DebugComponent::AddLine(const Vector2& from, const Vector2& to, const Color& c /* = ColorConstant::BLACK */)
-{
-    m_debugLines.push_back({{from.x, from.y, 0.f, 0.f}, c});
-    m_debugLines.push_back({{to.x, to.y, 0.f, 0.f}, c});
-}
-
-void DebugComponent::AddCircle(const Vector2& center, float radius, const Color& c /*= ColorConstant::BLACK*/)
-{
-    // Draw a cicle by approching it by "nbLines" lines
-    // Each points of this approximation is drawn with a certain angle.
-    constexpr int nbLines = 30;
-
-    const float stepAngle = (2.f * Math::PI) / (float)nbLines;
-    for (int i = 0; i <= nbLines; i++)
-    {
-        const float startAngle = stepAngle * (float)i;
-        const float endAngle = stepAngle * (float)(i + 1);
-
-        const Vector2 startPoint(center.x + radius * Math::Cos(startAngle), center.y + radius * Math::Sin(startAngle));
-        const Vector2 endPoint(center.x + radius * Math::Cos(endAngle), center.y + radius * Math::Sin(endAngle));
-
-        AddLine(startPoint, endPoint, c);
-    }
-}
-
-void DebugComponent::AddPolygon(const ArrayView<Vector2>& points, const Color& c /*= ColorConstant::BLACK*/,
-                                bool /*isSolid*/ /*= false*/)
-{
-    for (uint32 i = 0; i < points.size(); i++)
-    {
-        AddLine(points[i], points[(i + 1) % points.size()], c);
-    }
-}
-
-void DebugComponent::AddPoint(const Vector2& coord, const Color& c /*= ColorConstant::BLACK*/,
-                              bool /*isSolid*/ /*= false*/)
-{
-    AddCircle(coord, 0.1f, c);
 }
 
 int DebugComponent::AddDebugDrawer(const char* name, DebugMenuDrawerFunc&& callback)
@@ -73,11 +27,6 @@ void DebugComponent::RemoveDebugDrawer(int id)
     {
         m_drawers.erase(m_drawers.begin() + index);
     }
-}
-
-std::shared_ptr<ShaderProgram> DebugComponent::GetLineShader()
-{
-    return m_lineShaderProgram;
 }
 
 const Array<DebugLinePoint>& DebugComponent::GetDebugLines() const

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RedEngine/Core/Container/Map.hpp"
+#include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Input/InputDefinition.hpp"
 #include "RedEngine/Input/UserInputDefinition.hpp"
 #include "RedEngine/Math/Vector.hpp"
@@ -29,5 +30,7 @@ private:
     UserActionMapping m_actionMapping{};
     UserActionState m_state{};
 };
+
+RED_DECLARE_SINGLETON_COMPONENT(UserInputComponent);
 
 }  // namespace red

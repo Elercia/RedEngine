@@ -1,9 +1,10 @@
 #pragma once
 
 #include "RedEngine/Core/Container/Array.hpp"
-#include "RedEngine/Entity/Entity.hpp"
 #include "RedEngine/Core/Debug/DebugDraw/PhysicsDebugDraw.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
+#include "RedEngine/Entity/ComponentRegistry.hpp"
+#include "RedEngine/Entity/Entity.hpp"
 #include "RedEngine/Math/Vector.hpp"
 #include "RedEngine/Rendering/Color.hpp"
 
@@ -11,8 +12,6 @@
 
 namespace red
 {
-class ShaderProgram;
-class Text;
 
 struct DebugLinePoint
 {
@@ -38,15 +37,9 @@ public:
     explicit DebugComponent();
     ~DebugComponent() = default;
 
-    void AddLine(const Vector2& from, const Vector2& to, const Color& c = ColorConstant::BLACK);
-    void AddCircle(const Vector2& center, float radius, const Color& c = ColorConstant::BLACK);
-    void AddPolygon(const ArrayView<Vector2>& points, const Color& c = ColorConstant::BLACK, bool isSolid = false);
-    void AddPoint(const Vector2& coord, const Color& c = ColorConstant::BLACK, bool isSolid = false);
-
     int AddDebugDrawer(const char* name, DebugMenuDrawerFunc&& callback);
     void RemoveDebugDrawer(int id);
 
-    std::shared_ptr<ShaderProgram> GetLineShader();
     const Array<DebugLinePoint>& GetDebugLines() const;
     void ClearDebug();
 
@@ -56,9 +49,6 @@ public:
     void AddLog(const Logger::LogOoutputInfo& str);
     Array<Entity*>& GetFilteredEntities();
 
-private:
-    std::shared_ptr<ShaderProgram> m_lineShaderProgram;
-
     Array<DebugLinePoint> m_debugLines;
 
     std::unique_ptr<PhysicsDebugDrawer> m_physicsDebugDrawer;
@@ -66,7 +56,7 @@ private:
     Array<Logger::LogOoutputInfo> m_logs;
     Array<DebugDrawer> m_drawers;
     Array<Entity*> m_filteredEntities;
-
-    Text* m_fpsText;
 };
+RED_DECLARE_SINGLETON_COMPONENT(DebugComponent);
+
 }  // namespace red

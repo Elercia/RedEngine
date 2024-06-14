@@ -8,6 +8,8 @@
 #include "RedEngine/Core/Engine.hpp"
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 #include "RedEngine/Core/Time/Time.hpp"
+#include "RedEngine/Entity/World.hpp"
+#include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/StringUtils.hpp"
 
@@ -29,10 +31,9 @@ void ShowImGuiDemo(DebugComponent* /*debug*/)
     }
 }
 
-void DebugSystem::Init()
+void DebugSystemInitializer::Init()
 {
-    System::Init();
-    /*auto* debugComp = m_world->CreateWorldEntity("DebugSystemEntity")->AddComponent<DebugComponent>();
+    auto* debugComp = m_world->GetSingletonComponent<DebugComponent>();
 
     debugComp->m_outputFuncIndex =
         GetRedLogger()->AddOutput([=](const Logger::LogOoutputInfo& out) { debugComp->AddLog(out); });
@@ -41,18 +42,13 @@ void DebugSystem::Init()
     debugComp->AddDebugDrawer("Entities", &DebugSystem::RenderEntityTree);
     debugComp->AddDebugDrawer("Physics", &DebugSystem::RenderDebugPhysicsControls);
     debugComp->AddDebugDrawer("Misc", &ShowImGuiDemo);
-
-    debugComp->m_fpsText = new Text;
-    auto* fontLoader =
-        debugComp->GetWorld()->GetWorldComponent<ResourceHolderComponent>()->GetResourceLoader<FontResourceLoader>();
-    debugComp->m_fpsText->SetFont(fontLoader->LoadResource(Path::Resource(L"ENGINE_RESOURCES/ROBOTO_REGULAR")));*/
 }
 
-void DebugSystem::Finalize()
+void DebugSystemInitializer::Finalize()
 {
-    //auto* debugComp = m_world->GetWorldComponent<DebugComponent>();
+    auto* debugComp = m_world->GetSingletonComponent<DebugComponent>();
 
-    //GetRedLogger()->RemoveOutput(debugComp->m_outputFuncIndex);
+    GetRedLogger()->RemoveOutput(debugComp->m_outputFuncIndex);
 }
 
 void DebugSystem::RenderConsole(DebugComponent* debug)
@@ -70,7 +66,7 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
     {
         static ImGuiComboFlags flags = 0;
         LogLevel currentLogLevel = GetRedLogger()->GetLogLevel();
-        if (ImGui::BeginCombo("Log level", Logger::logLevelAsString[(int) currentLogLevel].c_str(), flags))
+        if (ImGui::BeginCombo("Log level", Logger::logLevelAsString[(int)currentLogLevel].c_str(), flags))
         {
             for (int level = 0; level < 7; level++)
             {
@@ -88,12 +84,12 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
 
     ImGui::SameLine();
 
-    static uint32 selectedLogLevels = (uint32) -1;
+    static uint32 selectedLogLevels = (uint32)-1;
     String shownLevels;
     int bit = 1;
     for (int level = 0; level < 7; level++)
     {
-        const bool isSelected = ((1 << (uint32) level) & selectedLogLevels) != 0;
+        const bool isSelected = ((1 << (uint32)level) & selectedLogLevels) != 0;
         if (isSelected)
         {
             if (bit != 1)
@@ -115,16 +111,16 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
         {
             for (int level = 0; level < 7; level++)
             {
-                const bool isSelected = ((1 << (uint32) level) & selectedLogLevels) != 0;
+                const bool isSelected = ((1 << (uint32)level) & selectedLogLevels) != 0;
                 if (ImGui::Selectable(Logger::logLevelAsString[level].c_str(), isSelected))
                 {
                     if (isSelected)
                     {
-                        selectedLogLevels &= ~(1 << (uint32) level);
+                        selectedLogLevels &= ~(1 << (uint32)level);
                     }
                     else
                     {
-                        selectedLogLevels |= (1 << (uint32) level);
+                        selectedLogLevels |= (1 << (uint32)level);
                     }
                 }
             }
@@ -154,7 +150,7 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
     const auto& logs = debug->GetLogBuffer();
     for (const auto& log : logs)
     {
-        if ((selectedLogLevels & (1 << (uint32) log.level)) == 0)
+        if ((selectedLogLevels & (1 << (uint32)log.level)) == 0)
         {
             continue;
         }
@@ -227,71 +223,46 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
 
 void DebugSystem::Update()
 {
-    //PROFILER_EVENT_CATEGORY("DebugSystem::Update", ProfilerCategory::Debug);
+    PROFILER_EVENT_CATEGORY("DebugSystem::Update", ProfilerCategory::Debug);
 
-    ///*auto events = QuerySingletonComponent<1>();
-    //auto debugComp = QuerySingletonComponent<0>();
-    //auto rendererComp = QuerySingletonComponent<3>();*/
+    auto events = std::get<const EventsComponent*>(m_query.GetSingletonComponents());
+    auto debugComp = std::get<DebugComponent*>(m_query.GetSingletonComponents());
 
-    ////m_world->GetPhysicsWorld()->DrawDebug();
+    // m_world->GetPhysicsWorld()->DrawDebug();
 
-    //debugComp->GetOwner()->GetComponent<Transform>()->SetLocalPosition(20.f, 100.f);
+    static bool open = true;
+    if (ImGui::Begin("Debug menu", &open))
+    {
+        const ImGuiTabBarFlags tab_bar_flags =
+            ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
+        if (ImGui::BeginTabBar("MenuDebugTabBar", tab_bar_flags))
+        {
+            for (auto& drawer : debugComp->m_drawers)
+            {
+                if (ImGui::BeginTabItem(drawer.name.c_str()))
+                {
+                    drawer.callback(debugComp);
 
-    //auto fps = 1000.f / Time::DeltaTime(false);
-    //auto fpsStr = fmt::format("FPS {:.0}", fps);
-    //debugComp->m_fpsText->SetText(fpsStr);
-    //rendererComp->GetRenderer().Draw(debugComp->m_fpsText, debugComp->GetOwner()->GetComponent<Transform>());
+                    ImGui::EndTabItem();
+                }
+            }
+            ImGui::EndTabBar();
+        }
+    }
+    ImGui::End();
 
-    //static bool open = true;
-    //if (ImGui::Begin("Debug menu", &open))
-    //{
-    //    const ImGuiTabBarFlags tab_bar_flags =
-    //        ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
-    //    if (ImGui::BeginTabBar("MenuDebugTabBar", tab_bar_flags))
-    //    {
-    //        for (auto& drawer : debugComp->m_drawers)
-    //        {
-    //            if (ImGui::BeginTabItem(drawer.name.c_str()))
-    //            {
-    //                drawer.callback(debugComp.Get());
+    if (events->GetKeyDown(KeyCodes::KEY_F5))
+    {
+        Time::SetTimeScale(Time::TimeScale() + 0.1F);
+    }
 
-    //                ImGui::EndTabItem();
-    //            }
-    //        }
-    //        ImGui::EndTabBar();
-    //    }
-    //}
-    //ImGui::End();
-
-    //if (events->GetKeyDown(KeyCodes::KEY_F2))
-    //{
-    //    CVar<FullScreenMode::Enum> fullscreen{"fullscreen_mode", "window", FullScreenMode::WINDOWED};
-
-    //    fullscreen.ChangeValue(fullscreen.GetValue() == FullScreenMode::WINDOWED ? FullScreenMode::FULLSCREEN
-    //                                                                             : FullScreenMode::WINDOWED);
-    //}
-
-    //if (events->GetKeyDown(KeyCodes::KEY_F5))
-    //{
-    //    Time::SetTimeScale(Time::TimeScale() + 0.1F);
-    //}
-
-    //if (events->GetKeyDown(KeyCodes::KEY_F6))
-    //{
-    //    Time::SetTimeScale(Time::TimeScale() - 0.1F);
-    //}
-
-    //if (events->GetKey(KeyCodes::KEY_B) && events->GetKey(KeyCodes::KEY_LCTRL))
-    //{
-    //    m_world->GetCurrentLevel()->Serialize(Path::Resource("serializedLevel.json"));
-    //}
-
-    //if (events->GetKey(KeyCodes::KEY_L) && events->GetKey(KeyCodes::KEY_LCTRL))
-    //{
-    //    m_world->LoadLevel(Path::Resource("serializedLevel.json"));
-    //}
+    if (events->GetKeyDown(KeyCodes::KEY_F6))
+    {
+        Time::SetTimeScale(Time::TimeScale() - 0.1F);
+    }
 }
 
+// TODO Add HierarchyComponent and NameComponent
 void ShowEntityList(DebugComponent* /*debug*/)
 {
     /*auto* world = debug->GetWorld();
@@ -402,6 +373,7 @@ void DebugSystem::RenderEntityTree(DebugComponent* debug)
     }
 }
 
+// TODO Physics
 void DebugSystem::RenderDebugPhysicsControls(DebugComponent* /*debug*/)
 {
     /*static bool enabled = false;

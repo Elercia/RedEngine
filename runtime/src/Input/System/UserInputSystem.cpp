@@ -12,75 +12,48 @@
 
 namespace red
 {
-UserInputSystem::UserInputSystem() : System(), m_inputComponent{nullptr}
-{
-}
-
-void UserInputSystem::Init()
-{
-    System::Init();
-
-    PROFILER_EVENT_CATEGORY("Input Init", ProfilerCategory::Input);
-
-    // TODO Init subsystems inside the engine
-    SDL_InitSubSystem(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK);
-
-   /* auto* entity = m_world->CreateWorldEntity("UserInputSystemEntity");
-
-    m_inputComponent = entity->AddComponent<UserInputComponent>();
-    m_inputComponent->m_actionMapping = utils::UserInputHelper::LoadActionMapping();
-
-    for (auto& mapping : m_inputComponent->m_actionMapping)
-    {
-        RED_LOG_INFO("Loaded mapping {}", mapping.first);
-    }*/
-}
-
-void UserInputSystem::Finalize()
-{
-    SDL_QuitSubSystem(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK);
-}
-
 void UserInputSystem::Update()
 {
     PROFILER_EVENT_CATEGORY("UserInputSystem::Update", ProfilerCategory::Input);
 
-    //auto eventsSystem = QuerySingletonComponent<0>();
-    //for (auto& actionMapping : m_inputComponent->m_actionMapping)
-    //{
-    //    const auto& actionName = actionMapping.first;
-    //    const auto& mapping = actionMapping.second;
+    const auto* eventsSystem = std::get<const EventsComponent*>(m_query.GetSingletonComponents());
+    auto* inputComponent = std::get<UserInputComponent*>(m_query.GetSingletonComponents());
+    
+    for (auto& actionMapping : inputComponent->m_actionMapping)
+    {
+        const auto& actionName = actionMapping.first;
+        const auto& mapping = actionMapping.second;
 
-    //    KeyState oldState = m_inputComponent->m_state[actionName];
-    //    KeyState mappingState = eventsSystem->GetKeyState(mapping.mapping);
+        KeyState oldState = inputComponent->m_state[actionName];
+        KeyState mappingState = eventsSystem->GetKeyState(mapping.mapping);
 
-    //    Array<KeyState> states;
+        Array<KeyState> states;
 
-    //    for (size_t i = 0; i < g_modifierKeys.size(); i++)
-    //    {
-    //        if (mapping.modifiers.test(i))
-    //        {
-    //            states.push_back(eventsSystem->GetKeyState(g_modifierKeys[i].keyCode));
-    //        }
-    //    }
+        for (size_t i = 0; i < g_modifierKeys.size(); i++)
+        {
+            if (mapping.modifiers.test(i))
+            {
+                states.push_back(eventsSystem->GetKeyState(g_modifierKeys[i].keyCode));
+            }
+        }
 
-    //    // Push the mapping
-    //    states.push_back(mappingState);
+        // Push the mapping
+        states.push_back(mappingState);
 
-    //    auto resultState = AglomerateKeyStates(oldState, states);
+        auto resultState = AglomerateKeyStates(oldState, states);
 
-    //    m_inputComponent->m_state[actionName] = resultState;
+        inputComponent->m_state[actionName] = resultState;
 
-    //    if (resultState.isDown)
-    //    {
-    //        RED_LOG_TRACE("User action {} is down", actionName);
-    //    }
+        if (resultState.isDown)
+        {
+            RED_LOG_TRACE("User action {} is down", actionName);
+        }
 
-    //    if (resultState.isUp)
-    //    {
-    //        RED_LOG_TRACE("User action {} is up", actionName);
-    //    }
-    //}
+        if (resultState.isUp)
+        {
+            RED_LOG_TRACE("User action {} is up", actionName);
+        }
+    }
 }
 
 KeyState UserInputSystem::AglomerateKeyStates(const KeyState& oldState, const Array<KeyState>& states)

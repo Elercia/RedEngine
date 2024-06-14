@@ -10,122 +10,115 @@
 
 namespace red
 {
-PhysicSystem::PhysicSystem() : System(), m_physicsWorld(nullptr /*world->GetPhysicsWorld()*/)
+void UpdatePhysicsFromEntitiesSystem::Update()
 {
+    PROFILER_EVENT_CATEGORY("UpdatePhysicsFromEntitiesSystem::Update", ProfilerCategory::Physics)
+
+    auto* physicsWorld = std::get<PhysicsWorld*>(m_query.GetSingletonComponents());
+    physicsWorld->ClearForces();
+
+    auto bodies = m_query.GetEntitiesComponents();
+
+    for (auto& tuple : bodies)
+    {
+        auto transform = std::get<const Transform2D*>(tuple);
+        auto physicBody = std::get<PhysicBody*>(tuple);
+
+        if (physicBody->IsStatic())
+        {
+            continue;
+        }
+
+        // FIXME : Manage object scale. Need to scale the different fixtures of the body
+        physicBody->GetBody()->SetTransform(ConvertToPhysicsVector(transform->localPosition),
+                                            transform->localRotationRad);
+    }
 }
 
-PhysicSystem::~PhysicSystem()
+const float UpdatePhysicSystem::timeStep = 1.0f / 60.f;
+const int32 UpdatePhysicSystem::velocityIterations = 6;
+const int32 UpdatePhysicSystem::positionIterations = 2;
+
+void UpdatePhysicSystem::Update()
 {
+    PROFILER_EVENT_CATEGORY("UpdatePhysicSystem::Update", ProfilerCategory::Physics)
+
+    auto* physicsWorld = std::get<PhysicsWorld*>(m_query.GetSingletonComponents());
+
+    physicsWorld->Step(timeStep, velocityIterations, positionIterations);
 }
 
-void PhysicSystem::Init()
+void UpdateEntitiesFromPhysicsSystem::Update()
 {
-    System::Init();
-}
+    PROFILER_EVENT_CATEGORY("UpdateEntitiesFromPhysicsSystem::Update", ProfilerCategory::Physics)
 
-void PhysicSystem::Finalize()
-{
-    // auto bodies = QueryComponents<0>();
-    // for (auto& tuple : bodies)
-    //{
-    //     auto physicBody = std::get<1>(tuple);
+    auto& scheduler = Engine::GetInstance()->GetScheduler();
 
-    //    m_physicsWorld->DestroyPhysicsBody(
-    //        physicBody.Get());  // Destroying a body will destroy all the fixture attached
-    //}
-}
+    auto bodies = m_query.GetEntitiesComponents();
 
-void PhysicSystem::Update()
-{
-    // PROFILER_EVENT_CATEGORY("PhysicSystem::Update", ProfilerCategory::Physics)
+    auto wgEnd = scheduler.SplitWorkLoad(
+        bodies.size(),
+        [&](const ThreadScheduler::WorkRange& range, int /*taskId*/)
+        {
+            PROFILER_EVENT_CATEGORY("PhysicSystem::CopyBackPositions", ProfilerCategory::Physics)
 
-    // m_physicsWorld->ClearForces();
+            for (int i = range.start; i < range.end; i++)
+            {
+                auto& tuple = bodies[i];
+                auto transform = std::get<Transform2D*>(tuple);
+                auto physicBody = std::get<const PhysicBody*>(tuple);
 
-    // auto& scheduler = Engine::GetInstance()->GetScheduler();
+                if (physicBody->IsStatic())
+                {
+                    continue;
+                }
 
-    // auto bodies = QueryComponents<0>();
+                transform->localPosition = ConvertFromPhysicsVector(physicBody->GetBody()->GetPosition());
+                transform->localRotationRad = physicBody->GetBody()->GetAngle();
+            }
+        });
 
-    // for (auto& tuple : bodies)
-    //{
-    //     auto transform = std::get<0>(tuple);
-    //     auto physicBody = std::get<1>(tuple);
-
-    //    if (physicBody->IsStatic())
-    //    {
-    //        continue;
-    //    }
-
-    //    transform->SetLocked(true);
-
-    //    // FIXME : Manage object scale. Need to scale the different fixtures of the body
-    //    physicBody->GetBody()->SetTransform(ConvertToPhysicsVector(transform->GetLocalPosition()),
-    //                                        transform->GetLocalRotationRad());
-    //}
-
-    // m_physicsWorld->Step(timeStep, velocityIterations, positionIterations);
-
-    // auto wgEnd = scheduler.SplitWorkLoad(
-    //     bodies.size(),
-    //     [&](const ThreadScheduler::WorkRange& range, int /*taskId*/)
-    //     {
-    //         PROFILER_EVENT_CATEGORY("PhysicSystem::CopyBackPositions", ProfilerCategory::Physics)
-
-    //        for (int i = range.start; i < range.end; i++)
-    //        {
-    //            auto& tuple = bodies[i];
-    //            auto transform = std::get<0>(tuple);
-    //            auto physicBody = std::get<1>(tuple);
-
-    //            if (physicBody->IsStatic())
-    //            {
-    //                continue;
-    //            }
-
-    //            transform->SetLocked(false);
-
-    //            transform->SetLocalPosition(ConvertFromPhysicsVector(physicBody->GetBody()->GetPosition()));
-    //            transform->SetLocalRotationRad(physicBody->GetBody()->GetAngle());
-    //            transform->UpdateWorldMatrixIfNeeded();
-    //        }
-    //    });
-
-    // wgEnd.Wait();
+    wgEnd.Wait();
 
     ManageCollisions();
     ManageTriggers();
 }
 
-void PhysicSystem::ManageCollisions()
+void UpdateEntitiesFromPhysicsSystem::ManageCollisions()
 {
-    PROFILER_EVENT_CATEGORY("PhysicSystem::ManageCollisions", ProfilerCategory::Physics)
+    PROFILER_EVENT_CATEGORY("UpdateEntitiesFromPhysicsSystem::ManageCollisions", ProfilerCategory::Physics)
 
-    //for (const auto& constCollision : m_physicsWorld->GetCollisions())
-    //{
-    //    auto collision = constCollision;  // copy
+    auto* physicsWorld = std::get<PhysicsWorld*>(m_query.GetSingletonComponents());
 
-    //    collision.firstPhysicBody->m_collisionSignal.emit(collision);
+    for (const auto& constCollision : physicsWorld->GetCollisions())
+    {
+        auto collision = constCollision;  // copy
 
-    //    collision.SwapFirstSecond();
+        collision.firstPhysicBody->m_collisionSignal.emit(collision);
 
-    //    collision.firstPhysicBody->m_collisionSignal.emit(collision);
-    //}
+        collision.SwapFirstSecond();
+
+        collision.firstPhysicBody->m_collisionSignal.emit(collision);
+    }
 }
 
-void PhysicSystem::ManageTriggers()
+void UpdateEntitiesFromPhysicsSystem::ManageTriggers()
 {
-    PROFILER_EVENT_CATEGORY("PhysicSystem::ManageTriggers", ProfilerCategory::Physics)
+    PROFILER_EVENT_CATEGORY("UpdateEntitiesFromPhysicsSystem::ManageTriggers", ProfilerCategory::Physics)
 
-    //const auto& triggers = m_physicsWorld->GetTriggers();
+    auto* physicsWorld = std::get<PhysicsWorld*>(m_query.GetSingletonComponents());
 
-    //for (const auto& constTrigger : triggers)
-    //{
-    //    auto triggerInfo = constTrigger;  // copy
+    const auto& triggers = physicsWorld->GetTriggers();
 
-    //    triggerInfo.firstPhysicBody->m_triggerSignal(triggerInfo);
+    for (const auto& constTrigger : triggers)
+    {
+        auto triggerInfo = constTrigger;  // copy
 
-    //    triggerInfo.SwapFirstSecond();
+        triggerInfo.firstPhysicBody->m_triggerSignal(triggerInfo);
 
-    //    triggerInfo.secondPhysicBody->m_triggerSignal(triggerInfo);
-    //}
+        triggerInfo.SwapFirstSecond();
+
+        triggerInfo.secondPhysicBody->m_triggerSignal(triggerInfo);
+    }
 }
 }  // namespace red

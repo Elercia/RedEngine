@@ -1,23 +1,24 @@
 #pragma once
 
+#include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
+#include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 #include "RedEngine/Entity/System.hpp"
+#include "RedEngine/Entity/Transform.hpp"
 
 namespace red
 {
-class DebugComponent;
-class EventsComponent;
+class DebugSystemInitializer : public SystemInitializer
+{
+    void Init() override;
+    void Finalize() override;
+};
 
-class DebugSystem : public System/*<SinglQuery<QueryRW<DebugComponent>>, 
-                                    SinglQuery<QueryRO<EventsComponent>>,
-                                  QueryGroup<QueryRO<Transform>>, SinglQuery<QueryRW<RendererComponent>>>*/
+using DebugSystemQuery = Query<Writing<DebugComponent>, Reading<EventsComponent>, Reading<Transform2D>>;
+class DebugSystem : public System<DebugSystemQuery>
 {
 public:
-    virtual void Init() override;
-    virtual void Finalize() override;
-
     void Update() override;
 
-private:
     static void RenderConsole(DebugComponent* debug);
     static void RenderEntityTree(DebugComponent* debug);
     static void RenderDebugPhysicsControls(DebugComponent* debug);

@@ -53,6 +53,7 @@
 #include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Entity/ComponentManager.hpp"
+#include "RedEngine/Entity/World.hpp"
 
 #include "RedEngine/Filesystem/FileSystemModule.hpp"
 #include "RedEngine/Filesystem/File.hpp"
@@ -76,7 +77,7 @@
 #include "RedEngine/Physics/PhysicsModule.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 #include "RedEngine/Physics/ContactInfo.hpp"
-#include "RedEngine/Physics/PhysicsWorld.hpp"
+#include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 #include "RedEngine/Physics/System/PhysicsSystem.hpp"
 
 #include "RedEngine/Rendering/Color.hpp"
@@ -136,6 +137,7 @@
 
 #include "Entity/ComponentRegistry.cpp"
 #include "Entity/ComponentManager.cpp"
+#include "Entity/World.cpp"
 
 #include "Filesystem/File.cpp"
 #include "Filesystem/Path.cpp"
@@ -151,7 +153,7 @@
 
 #include "Physics/Components/PhysicBody.cpp"
 #include "Physics/ContactInfo.cpp"
-#include "Physics/PhysicsWorld.cpp"
+#include "Physics/Components/PhysicsWorld.cpp"
 #include "Physics/System/PhysicSystem.cpp"
 
 #include "Resources/Resource.cpp"

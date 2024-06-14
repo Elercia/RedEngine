@@ -1,12 +1,13 @@
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 
 #include "RedEngine/Physics/PhysicsModule.hpp"
-#include "RedEngine/Physics/PhysicsWorld.hpp"
 
-#include <box2d/b2_shape.h>
+#include "RedEngine/Physics/Components/PhysicsWorld.hpp"
+
 #include <box2d/b2_circle_shape.h>
 #include <box2d/b2_edge_shape.h>
 #include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_shape.h>
 
 namespace red
 {
@@ -15,10 +16,9 @@ PhysicBody::PhysicBody() : m_desc(), m_body(nullptr), m_nextColliderIndex(0)
 {
 }
 
-PhysicBody::PhysicBody(const PhysicBodyCreationDesc& desc)
-    : m_desc(desc), m_body(nullptr), m_nextColliderIndex(0)
+PhysicBody::PhysicBody(const PhysicBodyCreationDesc& desc) : m_desc(desc), m_body(nullptr), m_nextColliderIndex(0)
 {
-    //entity->GetWorld()->GetPhysicsWorld()->InitPhysicsBody(this, m_desc);
+    // entity->GetWorld()->GetPhysicsWorld()->InitPhysicsBody(this, m_desc);
 }
 
 PhysicBody::~PhysicBody()
@@ -42,6 +42,11 @@ b2Body* PhysicBody::GetBody()
     return m_body;
 }
 
+const b2Body* PhysicBody::GetBody() const
+{
+    return m_body;
+}
+
 void PhysicBody::SetBody(b2Body* body)
 {
     m_body = body;
@@ -56,7 +61,7 @@ int PhysicBody::AddCollider(Collider&& collider, const ColliderDesc& desc)
     auto& colliderInserted = mapPair->second;
 
     b2FixtureUserData userData;
-    userData.pointer = (uintptr_t) &colliderInserted;
+    userData.pointer = (uintptr_t)&colliderInserted;
     colliderInserted.m_fixtureDef.userData = userData;
     colliderInserted.m_fixtureDef.isSensor = desc.isTrigger;
     colliderInserted.m_fixtureDef.restitution = desc.restitution;

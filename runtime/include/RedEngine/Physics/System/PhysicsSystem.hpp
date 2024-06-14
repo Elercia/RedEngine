@@ -1,34 +1,41 @@
 #pragma once
 
 #include "RedEngine/Entity/System.hpp"
+#include "RedEngine/Entity/Transform.hpp"
+#include "RedEngine/Physics/Components/PhysicBody.hpp"
+#include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 
 class b2Contact;
 
 namespace red
 {
-class PhysicsWorld;
-class PhysicBody;
-struct Collider;
+using UpdatePhysicsFromEntitiesSystemQuery = Query<Reading<Transform2D>, Writing<PhysicBody>, Writing<PhysicsWorld>>;
 
-class PhysicSystem : public System /*<QueryGroup<QueryRW<Transform>, QueryRW<PhysicBody>>>*/
+class UpdatePhysicsFromEntitiesSystem : public System<UpdatePhysicsFromEntitiesSystemQuery>
 {
-public:
-    PhysicSystem();
-    ~PhysicSystem();
+    void Update() override;
+};
 
-    void Init() override;
-    void Finalize() override;
+using UpdateEntitiesFromPhysicsSystemQuery = Query<Writing<Transform2D>, Reading<PhysicBody>, Writing<PhysicsWorld>>;
 
+class UpdateEntitiesFromPhysicsSystem : public System<UpdateEntitiesFromPhysicsSystemQuery>
+{
     void Update() override;
 
 private:
     void ManageCollisions();
     void ManageTriggers();
+};
+
+using UpdatePhysicSystemQuery = Query<Writing<PhysicsWorld>>;
+class UpdatePhysicSystem : public System<UpdatePhysicSystemQuery>
+{
+public:
+    void Update() override;
 
 private:
-    PhysicsWorld* m_physicsWorld;
-    float timeStep = 1.0f / 60.f;
-    int32 velocityIterations = 6;
-    int32 positionIterations = 2;
+    static const float timeStep;
+    static const int32 velocityIterations;
+    static const int32 positionIterations;
 };
 }  // namespace red
