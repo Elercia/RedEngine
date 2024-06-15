@@ -61,6 +61,8 @@ private:
 
     Array<BaseSystem*> m_systems;
     Array<SystemInitializer*> m_systemInitializers;
+
+    EntityId m_iCurrentEntityId;
 };
 }  // namespace red
 

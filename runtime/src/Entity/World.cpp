@@ -9,6 +9,7 @@ namespace red
 World::World()
     : m_componentRegistry(red_new(ComponentRegistry))
     , m_componentManager(red_new(ComponentManager, m_componentRegistry))
+    , m_iCurrentEntityId(0)
 {
 }
 
@@ -90,7 +91,9 @@ void World::RemoveSystemInitializer(const TypeTraits& traits)
 
 EntityId World::CreateEntity()
 {
-    return RandomUint32();
+    m_iCurrentEntityId++;
+
+    return m_iCurrentEntityId;
 }
 
 }  // namespace red
