@@ -45,8 +45,8 @@ public:
     void RemoveComponent(const TypeTraits& componentTraits, EntityId entityId);
 
     // Retreive a list of entities that matches the component list given as template parametters
-    template <typename... COMPS>
-    Array<Tuple<EntityId, COMPS*...>> GetComponents();
+    template <typename... COMPPTRS>
+    void GetComponents(Array<Tuple<EntityId, COMPPTRS...>>& tuples);
 
     template <typename SINGL>
     SINGL* GetSingletonComponent();
@@ -55,8 +55,8 @@ private:
     template <typename POOL>
     ComponentPool* GetPool();
 
-    template <typename... COMPS>
-    void Intersect(Array<Tuple<EntityId, COMPS*...>>& outResult, ArrayView<ComponentPool*> pools);
+    template <typename... COMPPTRS>
+    void Intersect(Array<Tuple<EntityId, COMPPTRS...>>& outResult, ArrayView<ComponentPool*> pools);
 
 private:
     ComponentRegistry* m_registry;

@@ -2,6 +2,7 @@
 
 #include "RedEngine/Entity/System.hpp"
 #include "RedEngine/Entity/Transform.hpp"
+#include "RedEngine/Utils/Random.hpp"
 
 namespace red
 {
@@ -86,4 +87,10 @@ void World::RemoveSystemInitializer(const TypeTraits& traits)
         }
     }
 }
+
+EntityId World::CreateEntity()
+{
+    return RandomUint32();
+}
+
 }  // namespace red

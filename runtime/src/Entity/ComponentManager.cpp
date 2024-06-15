@@ -59,7 +59,7 @@ ComponentVoidPtr ComponentManager::CreateComponent(const TypeTraits& componentTr
     auto it = m_pools.find(componentTraits);
     if (it == m_pools.end())
     {
-        //RED_LOG_ERROR("Failed to create a component of type {}.", componentTraits.name);
+        RED_LOG_ERROR("Failed to create a component of type {}.", componentTraits.name);
         return nullptr;
     }
 

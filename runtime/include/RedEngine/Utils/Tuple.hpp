@@ -40,7 +40,7 @@ inline constexpr typename std::enable_if<I == TupleSize<T1>::value, void>::type 
 template <std::size_t I = 0, typename T1, typename T2>
     inline constexpr typename std::enable_if < I<TupleSize<T1>::value, void>::type cast_tuple(T1& input, T2& output)
 {
-    std::get<I>(output) = reinterpret_cast<decltype(std::get<I>(output))>(std::get<I>(input));
+    std::get<I>(output) = reinterpret_cast<std::remove_reference_t<decltype(std::get<I>(output))>>(std::get<I>(input));
     cast_tuple<I + 1, T1, T2>(input, output);
 }
 

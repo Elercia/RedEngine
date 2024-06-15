@@ -40,6 +40,14 @@ public:
     template <typename TupleType>
     void QuerySingletons(TupleType& tuple);
 
+    template <typename TupleType>
+    void QueryComponents(Array<TupleType>& tuples);
+
+    EntityId CreateEntity();
+
+    template <typename COMP>
+    COMP* AddComponentToEntity(EntityId id);
+
 private:
     void AddSystem(BaseSystem* system, const TypeTraits& traits);
     void RemoveSystem(const TypeTraits& traits);

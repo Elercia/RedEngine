@@ -1,4 +1,3 @@
-#include "World.hpp"
 namespace red
 {
 template <typename T>
@@ -61,13 +60,25 @@ T* World::GetSingletonComponent()
 }
 
 template <typename TupleType>
-void red::World::QuerySingletons(TupleType& tuple)
+void World::QuerySingletons(TupleType& tuple)
 {
     for_each(tuple,
              [=](int /*index*/, auto& elem)
              {
-                 elem = m_componentManager->GetSingletonComponent <
-                        std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<decltype(elem)>>>>();
+                 elem = m_componentManager->GetSingletonComponent<
+                     std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<decltype(elem)>>>>();
              });
+}
+
+template <typename TupleType>
+void World::QueryComponents(Array<TupleType>& tuples)
+{
+    m_componentManager->GetComponents(tuples);
+}
+
+template <typename COMP>
+COMP* World::AddComponentToEntity(EntityId id)
+{
+    return m_componentManager->CreateComponent<COMP>(id);
 }
 }  // namespace red

@@ -11,6 +11,7 @@ using namespace red;
 
 struct WriteComp1
 {
+    EntityId id;
 };
 
 struct WriteComp2
@@ -19,6 +20,7 @@ struct WriteComp2
 
 struct ReadComp
 {
+    EntityId id;
 };
 
 struct NoNoNo
@@ -85,17 +87,26 @@ TEST_CASE("Create query", "[ECS]")
 }
 
 int g_updateCount = 0;
+#define EntityCount 10
 
-using TestSystemTestQuery = Query<Writing<WriteComp1>, Reading<SingletonTestComp>>;
+using TestSystemTestQuery = Query<Writing<WriteComp1>, Reading<ReadComp>, Reading<SingletonTestComp>>;
 struct TestSystem : public red::System<TestSystemTestQuery>
 {
     virtual void Update() override
     {
-        auto singls = m_query.GetSingletonComponents();
-        auto* singlComp = std::get<const SingletonTestComp*>(singls);
+        {
+            auto singls = m_query.GetSingletonComponents();
+            auto* singlComp = std::get<const SingletonTestComp*>(singls);
 
-        REQUIRE(singlComp != NULL);
-        REQUIRE(singlComp->value == 1);
+            REQUIRE(singlComp != NULL);
+            REQUIRE(singlComp->value == 1);
+        }
+
+        {
+            auto comps = m_query.GetEntitiesComponents();
+
+            REQUIRE(comps.size() == EntityCount);
+        }
 
         g_updateCount++;
     }
@@ -108,6 +119,36 @@ struct TestInitializer : public SystemInitializer
         auto comp = m_world->GetSingletonComponent<SingletonTestComp>();
 
         comp->value = 1;
+
+        // Create EntityCount entities with both components
+        for (int i = 0; i < EntityCount; i++)
+        {
+            EntityId id = m_world->CreateEntity();
+
+            auto* write1 = m_world->AddComponentToEntity<WriteComp1>(id);
+            write1->id = id;
+
+            auto* read = m_world->AddComponentToEntity<ReadComp>(id);
+            read->id = id;
+        }
+
+        // Create 1000 entities with only one component each
+        for (int i = 0; i < 1000; i++)
+        {
+            {
+                EntityId id = m_world->CreateEntity();
+
+                auto* write1 = m_world->AddComponentToEntity<WriteComp1>(id);
+                write1->id = id;
+            }
+
+            {
+                EntityId id = m_world->CreateEntity();
+
+                auto* read = m_world->AddComponentToEntity<ReadComp>(id);
+                read->id = id;
+            }
+        }
     }
 
     virtual void Finalize() override
@@ -120,6 +161,8 @@ TEST_CASE("System add/remove", "[ECS]")
     World world;
 
     world.RegisterComponent<SingletonTestComp>();
+    world.RegisterComponent<WriteComp1>();
+    world.RegisterComponent<ReadComp>();
 
     world.AddSystemInitializer<TestInitializer>();
     world.AddSystem<TestSystem>();
@@ -132,7 +175,6 @@ TEST_CASE("System add/remove", "[ECS]")
 
     world.RemoveSystem<TestSystem>();
     world.RemoveSystemInitializer<TestInitializer>();
-
 
     REQUIRE(g_updateCount == 1);
 }

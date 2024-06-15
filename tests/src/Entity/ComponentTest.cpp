@@ -194,7 +194,9 @@ TEST_CASE("Get components", "[ECS]")
 
         SECTION("Get one component type")
         {
-            auto comps = manager.GetComponents<TestComponent>();
+            Array<Tuple<EntityId, TestComponent*>> comps;
+            manager.GetComponents(comps);
+
             REQUIRE(comps.size() == 2);
 
             REQUIRE(std::get<0>(comps[0]) == entity1);
@@ -206,7 +208,8 @@ TEST_CASE("Get components", "[ECS]")
 
         SECTION("Get both components types")
         {
-            auto comps = manager.GetComponents<TestComponent, TestComponent2>();
+            Array<Tuple<EntityId, TestComponent*, TestComponent2*>> comps;
+            manager.GetComponents(comps);
             REQUIRE(comps.size() == 1);
 
             REQUIRE(std::get<0>(comps[0]) == entity1);

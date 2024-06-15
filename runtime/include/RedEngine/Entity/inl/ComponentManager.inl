@@ -6,21 +6,18 @@ COMP* ComponentManager::CreateComponent(EntityId entityId)
     return (COMP*)CreateComponent(TypeInfo<COMP>(), entityId);
 }
 
-template <typename... COMPS>
-Array<Tuple<EntityId, COMPS*...>> ComponentManager::GetComponents()
+template <typename... COMPPTRS>
+void ComponentManager::GetComponents(Array<Tuple<EntityId, COMPPTRS...>>& tuples)
 {
-    using CompsTupleType = Tuple<COMPS*...>;
+    using CompsTupleType = Tuple<COMPPTRS...>;
     constexpr auto CompsTupleTypeSize = TupleSize<CompsTupleType>::value;
 
     static_assert(CompsTupleTypeSize != 0, "You must call get component with at least one component");
 
-    ComponentPool* concernedPools[CompsTupleTypeSize] = {GetPool<COMPS>()...};
+    ComponentPool* concernedPools[CompsTupleTypeSize] = {
+        GetPool<std::remove_const_t<std::remove_pointer_t<COMPPTRS>>>()...};
 
-    Array<Tuple<EntityId, COMPS*...>> outResult;
-
-    Intersect(outResult, ArrayView(concernedPools, CompsTupleTypeSize));
-
-    return outResult;
+    Intersect(tuples, ArrayView(concernedPools, CompsTupleTypeSize));
 }
 
 template <typename COMP>
@@ -32,9 +29,6 @@ void ComponentManager::RemoveComponent(EntityId entityId)
 template <typename SINGL>
 inline SINGL* ComponentManager::GetSingletonComponent()
 {
-    static_assert(std::is_pointer_v<SINGL> == false && std::is_const_v<SINGL> == false &&
-                  std::is_reference_v<SINGL> == false);
-
     auto typeTraits = TypeInfo<SINGL>();
 
     auto it = m_singletons.find(typeTraits);
@@ -58,11 +52,11 @@ ComponentPool* ComponentManager::GetPool()
 
     return &it->second;
 }
-template <typename... COMPS>
-inline void ComponentManager::Intersect(Array<Tuple<EntityId, COMPS*...>>& outResult, ArrayView<ComponentPool*> pools)
+template <typename... COMPPTRS>
+inline void ComponentManager::Intersect(Array<Tuple<EntityId, COMPPTRS...>>& outResult, ArrayView<ComponentPool*> pools)
 {
-    using EntityAndCompsTupleType = Tuple<EntityId, COMPS*...>;
-    using CompsTupleType = Tuple<COMPS*...>;
+    using EntityAndCompsTupleType = Tuple<EntityId, COMPPTRS...>;
+    using CompsTupleType = Tuple<COMPPTRS...>;
     constexpr auto CompsTupleTypeSize = TupleSize<CompsTupleType>::value;
 
     // Find the pool with the least component inside

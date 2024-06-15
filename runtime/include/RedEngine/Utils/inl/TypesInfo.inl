@@ -3,6 +3,8 @@ namespace red
 template <typename T>
 constexpr TypeTraits TypeInfo()
 {
+    static_assert(std::is_pointer_v<T> == false && std::is_const_v<T> == false && std::is_reference_v<T> == false);
+
     constexpr StringView full_name{RED_FUNCNAME};
     constexpr StringView left_marker{RED_FUNCNAME_START};
     constexpr StringView right_marker{RED_FUNCNAME_END};

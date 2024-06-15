@@ -325,6 +325,7 @@ struct Query : public BaseQuery,
                   "System query made of something else than a component query type");
 
     using QueriedSingletonsTuple = decltype(GetQuerySingletonComponent<QueriesTypes...>());
+    using QueriedComponentsTupleArray = Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())>;
 
     QueriedSingletonsTuple GetSingletonComponents()
     {
@@ -336,7 +337,10 @@ struct Query : public BaseQuery,
 
     Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())> GetEntitiesComponents()
     {
-        return Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())>();
+        QueriedComponentsTupleArray components;
+        m_world->QueryComponents(components);
+
+        return components;
     }
 
     World* m_world;
