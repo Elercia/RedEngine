@@ -87,7 +87,7 @@ TEST_CASE("Create query", "[ECS]")
 }
 
 int g_updateCount = 0;
-#define EntityCount 10
+#define EntityCount 1000
 
 using TestSystemTestQuery = Query<Writing<WriteComp1>, Reading<ReadComp>, Reading<SingletonTestComp>>;
 struct TestSystem : public red::System<TestSystemTestQuery>
@@ -132,22 +132,23 @@ struct TestInitializer : public SystemInitializer
             read->id = id;
         }
 
-        // Create 1000 entities with only one component each
-        for (int i = 0; i < 1000; i++)
+        // Create a ton of entities with only WriteComp1
+        for (int i = 0; i < 100'000; i++)
         {
-            {
-                EntityId id = m_world->CreateEntity();
+            EntityId id = m_world->CreateEntity();
 
-                auto* write1 = m_world->AddComponentToEntity<WriteComp1>(id);
-                write1->id = id;
-            }
+            auto* write1 = m_world->AddComponentToEntity<WriteComp1>(id);
+            write1->id = id;
+        }
 
-            {
-                EntityId id = m_world->CreateEntity();
+        // Create a small sample of entities with only ReadComp
+        // Lookup should be based on this component number, not on the upper one
+        for (int i = 0; i < 100; i++)
+        {
+            EntityId id = m_world->CreateEntity();
 
-                auto* read = m_world->AddComponentToEntity<ReadComp>(id);
-                read->id = id;
-            }
+            auto* read = m_world->AddComponentToEntity<ReadComp>(id);
+            read->id = id;
         }
     }
 

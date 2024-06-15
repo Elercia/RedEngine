@@ -5,6 +5,7 @@
 #include "RedEngine/Utils/SystemInfo.hpp"
 
 #include <catch2/catch.hpp>
+#include <windows.h>
 
 namespace red
 {
@@ -44,6 +45,12 @@ void EngineTest::SetupLogger()
 }
 }  // namespace red
 
+static void LogToDebugger(const red::Logger::LogOoutputInfo & out)
+{
+    OutputDebugStringA(out.str.c_str());
+    OutputDebugStringA("\n");
+}
+
 int main(int argc, char* argv[])
 {
     // your setup ...
@@ -51,6 +58,11 @@ int main(int argc, char* argv[])
     red::InitSystemInfo();
 
     red::SetBreakOnError(false);
+
+    if (IsDebuggerPresent() != 0)
+    {
+        GetRedLogger()->AddOutput(LogToDebugger);
+    }
 
     int result = Catch::Session().run(argc, argv);
 
