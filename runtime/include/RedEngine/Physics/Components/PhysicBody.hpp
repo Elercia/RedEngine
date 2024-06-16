@@ -10,41 +10,39 @@
 
 namespace red
 {
+class PhysicsWorld;
+
+enum class ColiderType
+{
+    Circle,
+    Edge,
+    Polygon
+};
+
 struct ColliderDesc
 {
+    ColiderType colliderType;
+
     bool isTrigger{false};
     float friction{0.f};
     float restitution{1.f};
-};
 
-struct CircleColliderDesc : public ColliderDesc
-{
-    Vector2 center{0.f, 0.f};
-    float radius{0.1f};
-};
-
-struct EdgeColliderDesc : public ColliderDesc
-{
-    Vector2 start{0.f, 0.f};
-    Vector2 end{0.f, 0.f};
-};
-
-struct PolygonColliderDesc : public ColliderDesc
-{
-    Array<Vector2> points{};
-};
-
-using ColliderId = uint32;
-
-struct Collider
-{
-    b2FixtureDef m_fixtureDef;
-    b2Fixture* m_fixture{nullptr};
-
-    bool IsTrigger() const
+    struct
     {
-        return m_fixtureDef.isSensor;
-    }
+        Vector2 center{0.f, 0.f};
+        float radius{0.1f};
+    } circle;
+
+    struct
+    {
+        Vector2 start{0.f, 0.f};
+        Vector2 end{0.f, 0.f};
+    } edge;
+
+    struct
+    {
+        Array<Vector2> points{};
+    } polygon;
 };
 
 enum class PhysicsBodyType
@@ -56,10 +54,25 @@ enum class PhysicsBodyType
 
 struct PhysicBodyCreationDesc
 {
+    PhysicsWorld* world;
     PhysicsBodyType type{PhysicsBodyType::STATIC_BODY};
     float linearDamping{0.f};
     float angularDamping{0.f};
     float gravityScale{1.f};
+
+    Array<ColliderDesc> colliderDescs;
+};
+
+using ColliderId = uint32;
+
+struct Collider
+{
+    b2Fixture* m_fixture{nullptr};
+
+    bool IsTrigger() const
+    {
+        return m_fixture->IsSensor();
+    }
 };
 
 // TODO Collision layers
@@ -73,24 +86,19 @@ public:
     using OnTriggerSignalType = Signal<const TriggerInfo&>;
 
     PhysicBody();
-    PhysicBody(const PhysicBodyCreationDesc& desc);
     ~PhysicBody();
+
+    void CreateFrom(const PhysicBodyCreationDesc& desc);
 
     bool IsStatic() const;
 
     void ApplyForce(const Vector2& force, const Vector2& relativePosition);
 
-    int AddCircleCollider(const CircleColliderDesc& desc);
-    int AddEdgeCollider(const EdgeColliderDesc& desc);
-    int AddPolygonCollider(const PolygonColliderDesc& desc);
-
-    void RemoveCollider(int id);
-
     Map<ColliderId, Collider>& GetColliders();
     const Map<ColliderId, Collider>& GetColliders() const;
 
     b2Body* GetBody();
-    const b2Body* GetBody()const ;
+    const b2Body* GetBody() const;
     void SetBody(b2Body* body);
 
     OnTriggerSignalType m_triggerSignal;

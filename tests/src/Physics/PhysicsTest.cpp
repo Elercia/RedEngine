@@ -21,53 +21,31 @@ TEST_CASE("Component binding", "[PHYSICS]")
 {
     using namespace red;
 
-    /* auto engine = CreateEngineFrom<EngineTest>(0, nullptr);  // For double allocator
+    World world;
+    world.RegisterComponent<PhysicBody>();
+    world.RegisterComponent<PhysicsWorld>();
 
-    World w;
-     w.Init();
-     w.RegisterComponentType<PhysicBody>();
+    world.Init();
 
-     Entity* e = w.CreateWorldEntity("a");
-     PhysicSystem* system = w.AddSystem<PhysicSystem>();
+    EntityId entity = world.CreateEntity();
 
-     red::PhysicBodyCreationDesc desc = {red::PhysicsBodyType::DYNAMIC_BODY};
+    PhysicsWorld* physicWorld = world.GetSingletonComponent<PhysicsWorld>();
 
-     auto* body = e->AddComponent<PhysicBody>(desc);
+    red::PhysicBodyCreationDesc desc = {
+        .world = physicWorld,
+        .type = red::PhysicsBodyType::DYNAMIC_BODY,
+        .colliderDescs = {
+            ColliderDesc{.colliderType = ColiderType::Circle, .isTrigger = false, .circle = {.center = {5.F, 5.F}, .radius = 5.F}},
+            ColliderDesc{.colliderType = ColiderType::Polygon, .isTrigger = false, .polygon = {.points = {{0, 0}, {30, 0}, {30, 100}, {0, 100}}}},
+            ColliderDesc{.colliderType = ColiderType::Edge, .isTrigger = false, .edge = {.start = {0.f, 0.f}, .end = {1.f, 0.f}}}
+        }
+    };
 
-     {
-         red::CircleColliderDesc circleColliderDesc;
-         circleColliderDesc.isTrigger = false;
-         circleColliderDesc.center = {5.F, 5.F};
-         circleColliderDesc.radius = 5.F;
-         circleColliderDesc.restitution = 1.f;
-         circleColliderDesc.friction = 0.f;
+    auto* body = world.AddComponentToEntity<PhysicBody>(entity);
 
-         body->AddCircleCollider(circleColliderDesc);
-     }
+    body->CreateFrom(desc);
 
-     {
-         red::PolygonColliderDesc polygonColliderDesc;
-         polygonColliderDesc.isTrigger = false;
-         polygonColliderDesc.points = {{0, 0}, {30, 0}, {30, 100}, {0, 100}};
-         polygonColliderDesc.restitution = 1.f;
+    REQUIRE(size(body->GetBody()->GetFixtureList()) == 3);
 
-         body->AddPolygonCollider(polygonColliderDesc);
-     }
-
-     {
-         red::EdgeColliderDesc edgeColliderDesc;
-         edgeColliderDesc.isTrigger = false;
-         edgeColliderDesc.start = {0.f, 0.f};
-         edgeColliderDesc.end = {1.f, 0.f};
-
-         body->AddEdgeCollider(edgeColliderDesc);
-     }
-
-     system->Init();
-
-     REQUIRE(size(body->GetBody()->GetFixtureList()) == 3);
-
-     system->Finalize();
-
-     engine->Destroy();*/
+    world.Finalize();
 }

@@ -79,12 +79,15 @@ PhysicsWorld::~PhysicsWorld()
 
 void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreationDesc& creationDesc)
 {
-    b2BodyDef bodyDef;
-
     b2BodyUserData userData;
     userData.pointer = (uintptr_t)physicBody;
+
+    b2BodyDef bodyDef;
     bodyDef.userData = userData;
     bodyDef.allowSleep = false;
+    bodyDef.angularDamping = creationDesc.angularDamping;
+    bodyDef.linearDamping = creationDesc.linearDamping;
+    bodyDef.gravityScale = creationDesc.gravityScale;
 
     switch (creationDesc.type)
     {
@@ -100,6 +103,49 @@ void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreat
     }
 
     physicBody->m_body = m_internalPhysicsWorld->CreateBody(&bodyDef);
+
+    for (int i = 0; i < creationDesc.colliderDescs.size(); i++)
+    {
+        const auto& colliderDesc = creationDesc.colliderDescs[i];
+
+        b2Shape* shape = nullptr;
+
+        b2CircleShape circle;
+        b2PolygonShape polygon;
+        b2EdgeShape edge;
+
+        switch (colliderDesc.colliderType)
+        {
+            case ColiderType::Polygon:
+                shape = &polygon;
+                polygon.Set((b2Vec2*)colliderDesc.polygon.points.data(),
+                            colliderDesc.polygon.points.size());  // TODO handle vector conversion (ConvertToPhysicsVector)
+                break;
+            case ColiderType::Circle:
+                shape = &circle;
+                circle.m_p = ConvertToPhysicsVector(colliderDesc.circle.center);
+                circle.m_radius = ConvertToPhysicsDistance(colliderDesc.circle.radius);
+                break;
+            case ColiderType::Edge:
+                shape = &edge;
+                edge.m_vertex1 = ConvertToPhysicsVector(colliderDesc.edge.start);
+                edge.m_vertex2 = ConvertToPhysicsVector(colliderDesc.edge.end);
+                break;
+        }
+
+        b2FixtureDef b2ColliderDesc;
+        b2ColliderDesc.shape = shape;
+        b2ColliderDesc.friction = colliderDesc.friction;
+        b2ColliderDesc.isSensor = colliderDesc.isTrigger;
+        b2ColliderDesc.restitution = colliderDesc.restitution; // TODO add missing params ? 
+
+        auto* fixture = physicBody->m_body->CreateFixture(&b2ColliderDesc);
+
+        Collider collider;
+        collider.m_fixture = fixture;
+        physicBody->m_colliders.insert({physicBody->m_nextColliderIndex, collider});
+        physicBody->m_nextColliderIndex++;
+    }
 }
 
 void PhysicsWorld::DestroyPhysicsBody(PhysicBody* physicBody)
