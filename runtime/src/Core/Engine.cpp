@@ -77,31 +77,29 @@ bool Engine::RegisterComponentTypes()
 {
     PROFILER_EVENT();
 
-    // Rendering
-    //CheckReturn(m_world->RegisterComponentType<Renderable>());
-    //CheckReturn(m_world->RegisterComponentType<Sprite>());
-    //CheckReturn(m_world->RegisterComponentType<WindowComponent>());
-    //CheckReturn(m_world->RegisterComponentType<CameraComponent>());
+    m_world->RegisterComponent<Transform2D>();
 
-    //// Debug
-    //CheckReturn(m_world->RegisterComponentType<DebugComponent>());
+    // Debug
+    m_world->RegisterComponent<DebugComponent>();
 
-    //// Inputs
-    //CheckReturn(m_world->RegisterComponentType<EventsComponent>());
-    //CheckReturn(m_world->RegisterComponentType<UserInputComponent>());  // TODO Add a register for singleton component
-    //                                                                    // (allow faster lookups and more checks)
+    // Inputs
+    m_world->RegisterComponent<EventsComponent>();
+    m_world->RegisterComponent<UserInputComponent>();
 
-    //// Physics
-    //CheckReturn(m_world->RegisterComponentType<PhysicBody>());
+    // Physics
+    m_world->RegisterComponent<PhysicsWorld>();
+    m_world->RegisterComponent<PhysicBody>();
 
-    //// Resources
-    //CheckReturn(m_world->RegisterComponentType<ResourceHolderComponent>());
-
-    //// Audio
-    //CheckReturn(m_world->RegisterComponentType<AudioSource>());
-    //CheckReturn(m_world->RegisterComponentType<AudioListener>());
+    // Audio
+    m_world->RegisterComponent<AudioSubSystem>();
+    m_world->RegisterComponent<AudioSource>();
+    m_world->RegisterComponent<AudioListener>();
 
     return true;
+}
+
+bool Engine::RegisterSystems()
+{
 }
 
 #if defined(RED_WINDOWS) && defined(RED_DEVBUILD)
@@ -165,13 +163,12 @@ bool Engine::Create()
 
     InitAllocator();
 
-    //m_world = new World;
+    m_world = new World;
 
-    //RegisterComponentTypes();
+    RegisterComponentTypes();
+    RegisterSystems();
 
-    //m_world->Init();
-
-    //auto* worldEntity = m_world->CreateWorldEntity("ResourceHolder");
+    m_world->Init();
 
     //// TODO Put it inside a resource loader system
     //auto* resourceHolder = worldEntity->AddComponent<ResourceHolderComponent>();
@@ -184,7 +181,6 @@ bool Engine::Create()
     //resourceHolder->RegisterResourceLoader(ResourceType::SHADER_PROGRAM, new ShaderProgramResourceLoader(m_world));
 
     //m_world->BuildExecutionGraph();
-    //m_world->InitSystems();  // TODO Remove this init systems call and find a way to have "InitSystems" resposible
 
     return true;
 }
@@ -195,11 +191,11 @@ bool Engine::Destroy()
 
     /*auto* resourceHolder = m_world->GetWorldComponent<ResourceHolderComponent>();
 
-    resourceHolder->RemoveAllLoaders();
+    resourceHolder->RemoveAllLoaders();*/
 
-    m_world->Finalize();*/
+    m_world->Finalize();
 
-    //delete m_world;
+    delete m_world;
 
     red_free(m_frameAllocator);
 

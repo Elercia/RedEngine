@@ -54,7 +54,6 @@ enum class PhysicsBodyType
 
 struct PhysicBodyCreationDesc
 {
-    PhysicsWorld* world;
     PhysicsBodyType type{PhysicsBodyType::STATIC_BODY};
     float linearDamping{0.f};
     float angularDamping{0.f};
@@ -88,8 +87,6 @@ public:
     PhysicBody();
     ~PhysicBody();
 
-    void CreateFrom(const PhysicBodyCreationDesc& desc);
-
     bool IsStatic() const;
 
     void ApplyForce(const Vector2& force, const Vector2& relativePosition);
@@ -103,9 +100,6 @@ public:
 
     OnTriggerSignalType m_triggerSignal;
     OnCollisionSignalType m_collisionSignal;
-
-private:
-    int AddCollider(Collider&& collider, const ColliderDesc& desc);
 
 private:
     PhysicBodyCreationDesc m_desc;

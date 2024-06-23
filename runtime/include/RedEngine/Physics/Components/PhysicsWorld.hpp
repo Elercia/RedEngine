@@ -24,7 +24,7 @@ public:
     ~PhysicsWorld();
 
     void InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreationDesc& creationDesc);
-    void DestroyPhysicsBody(PhysicBody* physicBody);
+    void FinalizePhysicsBody(PhysicBody* physicBody);
 
     void Step(float timeStep, int32 velocityIterations, int32 positionIterations);
 

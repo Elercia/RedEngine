@@ -18,12 +18,7 @@ PhysicBody::PhysicBody() : m_desc(), m_body(nullptr), m_nextColliderIndex(0)
 
 PhysicBody::~PhysicBody()
 {
-}
-
-void PhysicBody::CreateFrom(const PhysicBodyCreationDesc& desc)
-{
-    RedAssert(desc.world != nullptr);
-    desc.world->InitPhysicsBody(this, desc);
+    RedAssert(m_body == nullptr, "PhysicBody has not been destroyed");
 }
 
 bool PhysicBody::IsStatic() const

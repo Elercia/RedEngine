@@ -148,7 +148,7 @@ void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreat
     }
 }
 
-void PhysicsWorld::DestroyPhysicsBody(PhysicBody* physicBody)
+void PhysicsWorld::FinalizePhysicsBody(PhysicBody* physicBody)
 {
     if (physicBody->GetBody() == nullptr)
         return;

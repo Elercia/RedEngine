@@ -33,6 +33,7 @@ public:
     virtual StringView GetGameName() const;
 
     virtual bool RegisterComponentTypes();
+    virtual bool RegisterSystems();
 
     virtual void SetupLogger();
     void InitAllocator();

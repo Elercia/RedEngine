@@ -32,7 +32,6 @@ TEST_CASE("Component binding", "[PHYSICS]")
     PhysicsWorld* physicWorld = world.GetSingletonComponent<PhysicsWorld>();
 
     red::PhysicBodyCreationDesc desc = {
-        .world = physicWorld,
         .type = red::PhysicsBodyType::DYNAMIC_BODY,
         .colliderDescs = {
             ColliderDesc{.colliderType = ColiderType::Circle, .isTrigger = false, .circle = {.center = {5.F, 5.F}, .radius = 5.F}},
@@ -43,9 +42,11 @@ TEST_CASE("Component binding", "[PHYSICS]")
 
     auto* body = world.AddComponentToEntity<PhysicBody>(entity);
 
-    body->CreateFrom(desc);
+    physicWorld->InitPhysicsBody(body, desc);
 
     REQUIRE(size(body->GetBody()->GetFixtureList()) == 3);
+
+    physicWorld->FinalizePhysicsBody(body);
 
     world.Finalize();
 }
