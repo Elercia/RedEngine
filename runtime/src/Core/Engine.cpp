@@ -1,20 +1,23 @@
 
-#include "RedEngine/Core/Engine.hpp"
-
 #include "RedEngine/Core/CoreModule.hpp"
 
 #include "RedEngine/Audio/Component/AudioListener.hpp"
 #include "RedEngine/Audio/Component/AudioSource.hpp"
+#include "RedEngine/Audio/Component/AudioSubSystem.hpp"
 #include "RedEngine/Audio/Resource/SoundResourceLoader.hpp"
 #include "RedEngine/Core/Configuration/CVar.hpp"
 #include "RedEngine/Core/Configuration/CVarManager.hpp"
 #include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
+#include "RedEngine/Core/Engine.hpp"
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 #include "RedEngine/Core/Time/FrameCounter.hpp"
 #include "RedEngine/Core/Time/Time.hpp"
+#include "RedEngine/Entity/Transform.hpp"
+#include "RedEngine/Entity/World.hpp"
 #include "RedEngine/Input/Component/UserInput.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
+#include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 #include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/Random.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"
@@ -64,7 +67,7 @@ void Engine::MainLoop()
 
         Time::SetDeltaTime(deltaTime);
 
-        //continueExec = m_world->Update();
+        // continueExec = m_world->Update();
 
         for (int i = 0; i < m_scheduler.GetWorkerCount(); i++)
         {
@@ -100,6 +103,7 @@ bool Engine::RegisterComponentTypes()
 
 bool Engine::RegisterSystems()
 {
+    return true;
 }
 
 #if defined(RED_WINDOWS) && defined(RED_DEVBUILD)
@@ -171,16 +175,16 @@ bool Engine::Create()
     m_world->Init();
 
     //// TODO Put it inside a resource loader system
-    //auto* resourceHolder = worldEntity->AddComponent<ResourceHolderComponent>();
-    //resourceHolder->RegisterResourceLoader(ResourceType::SPRITE, new SpriteResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::TEXTURE2D, new TextureResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::SOUND, new SoundResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::MATERIAL, new MaterialResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::GEOMETRY, new GeometryResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::FONT, new FontResourceLoader(m_world));
-    //resourceHolder->RegisterResourceLoader(ResourceType::SHADER_PROGRAM, new ShaderProgramResourceLoader(m_world));
+    // auto* resourceHolder = worldEntity->AddComponent<ResourceHolderComponent>();
+    // resourceHolder->RegisterResourceLoader(ResourceType::SPRITE, new SpriteResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::TEXTURE2D, new TextureResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::SOUND, new SoundResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::MATERIAL, new MaterialResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::GEOMETRY, new GeometryResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::FONT, new FontResourceLoader(m_world));
+    // resourceHolder->RegisterResourceLoader(ResourceType::SHADER_PROGRAM, new ShaderProgramResourceLoader(m_world));
 
-    //m_world->BuildExecutionGraph();
+    // m_world->BuildExecutionGraph();
 
     return true;
 }

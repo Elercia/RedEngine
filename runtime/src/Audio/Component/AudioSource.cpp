@@ -7,12 +7,8 @@
 
 namespace red
 {
-AudioSource::AudioSource(const SoundDesc& desc) : m_desc(desc), m_currentChannel(nullptr)
+AudioSource::AudioSource() : m_desc(), m_currentChannel(nullptr)
 {
-    /*m_sound = m_owner->GetWorld()
-                  ->GetWorldComponent<ResourceHolderComponent>()
-                  ->GetResourceLoader<SoundResourceLoader>()
-                  ->LoadResource(Path::Resource(desc.name));*/
 }
 
 void AudioSource::Play()

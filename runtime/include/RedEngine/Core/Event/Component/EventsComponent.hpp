@@ -15,7 +15,7 @@ class EventsComponent
     friend class EventSystem;
 
 public:
-    EventsComponent(Entity* entity);
+    EventsComponent();
     ~EventsComponent();
 
     [[nodiscard]] bool GetKey(KeyCodes::Enum key) const;

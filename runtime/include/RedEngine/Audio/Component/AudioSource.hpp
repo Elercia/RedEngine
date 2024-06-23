@@ -14,7 +14,6 @@ class SoundResource;
 struct AudioSource
 {
     AudioSource();
-    AudioSource(const SoundDesc& desc);
     ~AudioSource() = default;
 
     void Play();
