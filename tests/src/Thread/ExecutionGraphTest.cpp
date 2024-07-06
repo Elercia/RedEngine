@@ -37,22 +37,21 @@ TEST_CASE("Parallel graph", "[Thread]")
 
     ExecutionGraph graph;
 
-    int counter = 0;
-    int a = 0;
-    int b = 0;
-    int c = 0;
+    std::atomic<int> counter = 0;
+    int a, b, c, d, e, f, g;
+    a = b = c = d = e = f = g = 0;
 
     auto& nodeA = graph.Node("A", [&]() { a = counter++; });
 
     auto& nodeB = graph.Node("B", [&]() { b = counter++; }).After("A");
 
     auto& nodeC = graph.Node("C", [&]() { c = counter++; }).After("B");
-    auto& nodeD = graph.Node("D", [&]() { c = counter++; }).After("B");
-    auto& nodeE = graph.Node("E", [&]() { c = counter++; }).After("B");
+    auto& nodeD = graph.Node("D", [&]() { d = counter++; }).After("B");
+    auto& nodeE = graph.Node("E", [&]() { e = counter++; }).After("B");
 
-    auto& nodeF = graph.Node("F", [&]() { c = counter++; }).After("D");
+    auto& nodeF = graph.Node("F", [&]() { f = counter++; }).After("D");
 
-    auto& nodeG = graph.Node("G", [&]() { c = counter++; }).After("C").After("F").After("E");
+    auto& nodeG = graph.Node("G", [&]() { g = counter++; }).After("C").After("F").After("E");
 
     graph.Process();
 
@@ -82,6 +81,24 @@ TEST_CASE("Parallel graph", "[Thread]")
 
     REQUIRE(graph.GetBuckets()[4].m_nodes.FindIf([&](ExecutionNode* node) { return node == &nodeG; }) !=
             Array<ExecutionNode*>::npos);
+
+    graph.Execute();
+
+    REQUIRE(a == 0);
+    REQUIRE(b == 1);
+
+    const bool cOk = (c == 2 || c == 3 || c == 4);
+    REQUIRE(cOk);
+
+    const bool dOk = (d == 2 || d == 3 || d == 4);
+    REQUIRE(dOk);
+
+    const bool eOk = (e == 2 || e == 3 || e == 4);
+    REQUIRE(eOk);
+
+    REQUIRE(f == 5 );
+    REQUIRE(g == 6 );
+
 
     engine->Destroy();
 }
