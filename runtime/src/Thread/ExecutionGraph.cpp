@@ -2,6 +2,7 @@
 
 #include "RedEngine/Core/Debug/DebugMacros.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
+#include "RedEngine/Core/Engine.hpp"
 
 namespace red
 {
@@ -26,6 +27,26 @@ ExecutionNode& ExecutionNode::Before(StringView name)
     m_owner->GetOrCreateNode(name).m_befores.push_back(this);
 
     return *this;
+}
+
+bool ExecutionNode::DependsOnRecursive(const ExecutionNode* other) const
+{
+    RedAssert(other != this);
+
+    if (m_befores.FindIf([&](ExecutionNode* arOther) { return arOther == other; }) != Array<ExecutionNode*>::npos)
+    {
+        return true;
+    }
+
+    for (auto* beforeNode : m_befores)
+    {
+        if (beforeNode->DependsOnRecursive(other))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 ExecutionGraph::ExecutionGraph() : m_bDirty(true)
@@ -67,6 +88,24 @@ ExecutionNode& ExecutionGraph::GetOrCreateNode(StringView name)
     return *m_nodes.back();
 }
 
+bool ExecutionGraph::CanBePlacedInside(ExecutionBucket& bucket, const ExecutionNode& node)
+{
+    for (auto* bucketNode : bucket.m_nodes)
+    {
+        if (node.DependsOnRecursive(bucketNode))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+const Array<ExecutionBucket>& ExecutionGraph::GetBuckets() const
+{
+    return m_buckets;
+}
+
 bool ExecutionGraph::Visit(ExecutionNode& node)
 {
     if (node.m_permanentMark)
@@ -90,32 +129,87 @@ bool ExecutionGraph::Visit(ExecutionNode& node)
     return true;
 }
 
+void ExecutionGraph::Process()
+{
+    // Compute the list of sorted node using topological sorting
+    m_sortedNodes.clear();
+    m_buckets.clear();
+    for (auto* node : m_nodes)
+    {
+        node->m_permanentMark = false;
+        node->m_tempMark = false;
+    }
+
+    for (auto* node : m_nodes)
+    {
+        if (node->m_permanentMark == false && Visit(*node) == false)
+        {
+            RED_LOG_ERROR("Circular dependency inside this execution graph");
+            return;
+        }
+    }
+
+    // Construct a list of buckets
+    // Each bucket will be runned in parrallel
+    for (auto* node : m_sortedNodes)
+    {
+        bool hasBeenPlaced = false;
+
+        // Check if the node can be placed inside a bucket
+        // It can be placed inside a bucket if the bucket does not contain a node that is in the current node dependency
+        // (recursivelly)
+        for (auto& bucket : m_buckets)
+        {
+            if (CanBePlacedInside(bucket, *node))
+            {
+                hasBeenPlaced = true;
+                bucket.m_nodes.push_back(node);
+                break;
+            }
+        }
+
+        if (!hasBeenPlaced)
+        {
+            auto& bucket = m_buckets.emplace_back();
+
+            bucket.m_nodes.push_back(node);
+        }
+    }
+
+    m_bDirty = false;
+}
+
 void ExecutionGraph::Execute()
 {
     if (m_bDirty)
     {
-        m_sortedNodes.clear();
-        for (auto* node : m_nodes)
-        {
-            node->m_permanentMark = false;
-            node->m_tempMark = false;
-        }
+        Process();
 
-        for (auto* node : m_nodes)
-        {
-            if (node->m_permanentMark == false && Visit(*node) == false)
-            {
-                RED_LOG_ERROR("Circular dependency inside this execution graph");
-                break;
-            }
-        }
-        m_bDirty = false;
+        if (m_bDirty)
+            return;  // Illegal graph
     }
 
-    for (int i = 0; i < m_sortedNodes.size(); i++)
+    auto& scheduler = Engine::GetInstance()->GetScheduler();
+
+    for (uint32 i = 0; i < m_buckets.size(); i++)
     {
-        auto* node = m_sortedNodes[i];
-        node->m_func();
+        auto* bucket = &m_buckets[i];
+
+        bucket->group = red_new(WaitGroup, bucket->m_nodes.size());
+
+        for (auto* node : bucket->m_nodes)
+        {
+            scheduler.Schedule(
+                [=]() // By copy since it will be dispatched in multithread
+                {
+                    node->m_func();
+                    bucket->group->Done();
+                });
+        }
+
+        bucket->group->Wait();
+
+        red_delete(bucket->group);
     }
 }
 }  // namespace red

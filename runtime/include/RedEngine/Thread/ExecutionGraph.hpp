@@ -3,6 +3,7 @@
 #include "RedEngine/Core/Container/Array.hpp"
 #include "RedEngine/Core/Container/String.hpp"
 #include "RedEngine/Utils/Uncopyable.hpp"
+#include "RedEngine/Thread/Thread.hpp"
 
 namespace red
 {
@@ -18,6 +19,8 @@ public:
     ExecutionNode& After(StringView name);
     ExecutionNode& Before(StringView name);
 
+    bool DependsOnRecursive(const ExecutionNode* other) const;
+
 private:
     ExecutionGraph* m_owner;
     String m_name;
@@ -30,6 +33,13 @@ private:
     bool m_tempMark;
 };
 
+struct ExecutionBucket
+{
+    Array<ExecutionNode*> m_nodes;
+
+    WaitGroup* group;
+};
+
 class ExecutionGraph : public Uncopyable
 {
     friend class ExecutionNode;
@@ -40,14 +50,20 @@ public:
 
     ExecutionNode& Node(StringView name, ExecutionNode::Func func);
 
+    void Process();
     void Execute();
+
+    const Array<ExecutionBucket>& GetBuckets() const;
 
 private:
     ExecutionNode& GetOrCreateNode(StringView name);
     bool Visit(ExecutionNode& node);
 
+    bool CanBePlacedInside(ExecutionBucket& bucket, const ExecutionNode& node);
+
     Array<ExecutionNode*> m_nodes;
-    Array<ExecutionNode*> m_sortedNodes;
+    Array<ExecutionNode*> m_sortedNodes; // TODO add generic templated function to sort task graphs
+    Array<ExecutionBucket> m_buckets; 
     bool m_bDirty;
 };
 }  // namespace red
