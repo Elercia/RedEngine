@@ -104,7 +104,7 @@ void PhysicsWorld::InitPhysicsBody(PhysicBody* physicBody, const PhysicBodyCreat
 
     physicBody->m_body = m_internalPhysicsWorld->CreateBody(&bodyDef);
 
-    for (int i = 0; i < creationDesc.colliderDescs.size(); i++)
+    for (uint32 i = 0; i < creationDesc.colliderDescs.size(); i++)
     {
         const auto& colliderDesc = creationDesc.colliderDescs[i];
 
