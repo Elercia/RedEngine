@@ -167,6 +167,7 @@ bool Engine::Create()
 
     InitAllocator();
 
+    RedAssert(m_world == nullptr);
     m_world = new World;
 
     RegisterComponentTypes();

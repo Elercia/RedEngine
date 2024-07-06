@@ -53,8 +53,6 @@ static void LogToDebugger(const red::Logger::LogOoutputInfo & out)
 
 int main(int argc, char* argv[])
 {
-    // your setup ...
-
     red::InitSystemInfo();
 
     red::SetBreakOnError(false);

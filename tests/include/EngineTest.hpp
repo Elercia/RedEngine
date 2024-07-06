@@ -7,9 +7,6 @@ namespace red
 class EngineTest : public red::Engine
 {
 public:
-    EngineTest();
-    virtual ~EngineTest();
-
     virtual bool Create() override;
     virtual bool Destroy() override;
 
