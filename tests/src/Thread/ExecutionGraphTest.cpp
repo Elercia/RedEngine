@@ -7,27 +7,19 @@ using namespace red;
 TEST_CASE("Simple execution graph", "[Thread]")
 {
     ExecutionGraph graph;
-    graph.New();
 
-    int executionOrders[10];
-    int executionIndex = 0;
+    int counter = 0;
+    int a = 0;
+    int b = 0;
+    int c = 0;
 
-    for (int i = 0; i < 10; i++)
-    {
-        graph.AddStage(
-            [&executionOrders, &executionIndex, i]()
-            {
-                executionOrders[i] = executionIndex;
-                executionIndex++;
-            });
-    }
+    graph.Node("B", [&]() { b = counter++; }).After("A").Before("C");
+    graph.Node("A", [&]() { a = counter++; });
+    graph.Node("C", [&]() { c = counter++; });
 
-    REQUIRE(executionIndex == 0);
+    graph.Execute();
 
-    graph.Run();
-
-    for (int i = 0; i < 10; i++)
-    {
-        REQUIRE(executionOrders[i] == i);
-    }
+    REQUIRE(a == 0);
+    REQUIRE(b == 1);
+    REQUIRE(c == 2);
 }
