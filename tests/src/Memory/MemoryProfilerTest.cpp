@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <catch2/catch.hpp>
+#include <random>
 
 using namespace red;
 

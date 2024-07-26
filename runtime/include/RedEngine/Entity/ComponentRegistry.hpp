@@ -3,6 +3,8 @@
 #include "RedEngine/Core/Container/Map.hpp"
 #include "RedEngine/Utils/TypesInfo.hpp"
 
+#include <functional>
+
 namespace red
 {
 using ComponentVoidPtr = void*;

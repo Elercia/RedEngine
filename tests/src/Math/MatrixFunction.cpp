@@ -5,11 +5,9 @@
 
 #include <catch2/catch.hpp>
 #include <fmt/core.h>
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_transform_2d.hpp>
 #include <iostream>
 
 using namespace red;

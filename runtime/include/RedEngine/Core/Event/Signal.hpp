@@ -4,6 +4,7 @@
 #include "RedEngine/Utils/Uncopyable.hpp"
 
 #include <functional>
+#include <memory>
 
 namespace red
 {
