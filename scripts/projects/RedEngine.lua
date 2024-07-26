@@ -139,6 +139,9 @@ function RedDefaultProjectOptions()
 	{
 		"FMT_EXCEPTIONS=0",
 	}
+
+	buildoptions { "/source-charset:utf-8 /execution-charset:utf-8" }
+
 end
 
 workspace "RedEngine"
@@ -186,6 +189,8 @@ workspace "RedEngine"
   		buildoptions { "/Zc:hiddenFriend-" } -- Bug in MSVC : https://github.com/catchorg/Catch2/issues/2174
 	filter {}
 
+	defines("NOMINMAX")
+
 	filter { "toolset:clang" }
 		buildoptions 
 		{ 
@@ -193,7 +198,6 @@ workspace "RedEngine"
 			"-Wno-c++98-compat-pedantic"
 		} 
 	filter {}
-
 
 include "External.lua"
 include "RedEngineLib.lua"

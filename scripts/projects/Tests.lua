@@ -34,4 +34,10 @@ project ("RedEngineTest")
 
 	exceptionhandling("On")
 
+	-- GLM output some warnings
+	disablewarnings{	"4828", 	-- The file contains a character starting at offset ... that is illegal in the current source character set 
+						"5033", 	-- 'register' is no longer a supported storage class
+						"4201", 	-- nonstandard extension used: nameless struct/union
+					}
+
 	postbuildcommands { "{COPYFILE} \"%{cfg.buildtarget.abspath}\" \"" .. rootPath .. "tests\"" }

@@ -47,7 +47,7 @@ filter { "platforms:Win64" }
 filter {}
 
 -- Json
-table.insert(ExternalIncludeDirs, externalDirectoryPath .. "/nlohmann_json/single_include")
+table.insert(ExternalIncludeDirs, externalDirectoryPath .. "/NlohmannJson")
 
 -- Catch2
 table.insert(ExternalIncludeDirs, externalDirectoryPath .. "/Catch2/include")
@@ -125,6 +125,11 @@ function ExternalLibs(Name, IsStaticLib, IncludeDirectory)
 		symbols "Off"
 	filter {}
 
+	--filter { "toolset:msc" }
+		buildoptions { "/source-charset:utf-8 /execution-charset:utf-8" }
+	--filter {}
+	
+
 end
 
 --------------------------------------------------------------
@@ -147,7 +152,8 @@ ExternalLibs("Box2D", true, "/Box2D/include")
 ExternalLibs("fmt", true, "/fmt/include")
 	files
 	{
-		externalDirectoryPath .. "/fmt/src/**.cc",
+		externalDirectoryPath .. "/fmt/src/format.cc",
+		externalDirectoryPath .. "/fmt/src/os.cc",
 		externalDirectoryPath .. "/fmt/include/**.h",
 	}
 
