@@ -39,7 +39,7 @@ public:
     LogLevel GetLogLevel() const;
 
     template <typename... Args>
-    void LogInternal(LogLevel level, int line, const char* file, const String& format, Args... args);
+    void LogInternal(LogLevel level, int line, const char* file, const StringView& format, Args... args);
 
     void Out(const LogOoutputInfo& data);
 

@@ -9,17 +9,17 @@
 namespace red
 {
 template <typename... Args>
-void Logger::LogInternal(LogLevel level, int line, const char* file, const String& format, Args... args)
+void Logger::LogInternal(LogLevel level, int line, const char* file, const StringView& format, Args... args)
 {
     if (level >= m_logLevel)
     {
-        String levelAsString = logLevelAsString[(int)level];
-        String fileFormat = String(file);
-        fileFormat = fileFormat.substr(fileFormat.find_last_of(std::filesystem::path::preferred_separator) + 1);
+        const String& levelAsString = logLevelAsString[(int)level];
+        StringView fileFormat =
+            StringView(file).substr(StringView(file).find_last_of(std::filesystem::path::preferred_separator) + 1);
         String levelFormat =
             fmt::format(FMT_STRING("[{}({})] [{}] "), fileFormat, line, levelAsString);
 
-        String logString = fmt::format(format, std::forward<Args>(args)...);
+        String logString = fmt::vformat(format, fmt::make_format_args(args...));
 
         LogOoutputInfo info;
         info.str = levelFormat + logString;

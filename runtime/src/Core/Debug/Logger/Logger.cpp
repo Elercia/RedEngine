@@ -48,8 +48,7 @@ void Logger::RemoveOutput(Logger::OutputDelegate::FuncIndex index)
 
 void Logger::LogToStandardOutputFun(const LogOoutputInfo& out)
 {
-    fmt::print(out.str);
-    std::putc('\n', stdout);
+    fmt::print("{}\n", out.str);
 }
 
 template <>
