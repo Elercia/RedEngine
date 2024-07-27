@@ -25,6 +25,8 @@ public:
     T* AddSystem();
     template <typename T>
     void RemoveSystem();
+    template <typename T>
+    T* GetSystem();
 
     template <typename T>
     void RegisterComponent();

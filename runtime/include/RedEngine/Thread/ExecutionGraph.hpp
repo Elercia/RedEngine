@@ -21,7 +21,9 @@ public:
 
     bool DependsOnRecursive(const ExecutionNode* other) const;
 
-private:
+    const String& GetName() const;
+
+protected:
     ExecutionGraph* m_owner;
     String m_name;
     Array<ExecutionNode*> m_befores;
@@ -36,8 +38,6 @@ private:
 struct ExecutionBucket
 {
     Array<ExecutionNode*> m_nodes;
-
-    WaitGroup* group;
 };
 
 class ExecutionGraph : public Uncopyable
@@ -55,11 +55,11 @@ public:
 
     const Array<ExecutionBucket>& GetBuckets() const;
 
-private:
-    ExecutionNode& GetOrCreateNode(StringView name);
+protected:
+    virtual ExecutionNode& GetOrCreateNode(StringView name);
     bool Visit(ExecutionNode& node);
 
-    bool CanBePlacedInside(ExecutionBucket& bucket, const ExecutionNode& node);
+    virtual bool CanBePlacedInside(ExecutionBucket& bucket, const ExecutionNode& node);
 
     Array<ExecutionNode*> m_nodes;
     Array<ExecutionNode*> m_sortedNodes; // TODO add generic templated function to sort task graphs

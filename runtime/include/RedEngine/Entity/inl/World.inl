@@ -14,6 +14,21 @@ T* World::AddSystem()
 }
 
 template <typename T>
+T* World::GetSystem()
+{
+    static_assert(std::is_base_of<BaseSystem, T>::value, "AddSystem called with a type that is not a system");
+
+    constexpr auto typeInfo = TypeInfo<T>();
+    for (auto* ptr : m_systems)
+    {
+        if (ptr->m_traits == typeInfo)
+            return (T*)ptr;
+    }
+
+    return nullptr;
+}
+
+template <typename T>
 void World::RemoveSystem()
 {
     static_assert(std::is_base_of<BaseSystem, T>::value, "RemoveSystem called with a type that is not a system");

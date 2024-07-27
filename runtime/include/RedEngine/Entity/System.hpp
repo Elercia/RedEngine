@@ -24,7 +24,7 @@ class BaseSystem
 {
 public:
     virtual void Update() = 0;
-
+    virtual BaseQuery* GetQuery() = 0;
     World* m_world;
     TypeTraits m_traits;
 };
@@ -36,6 +36,11 @@ public:
     static_assert(std::is_base_of<BaseQuery, QueryType>::value, "Not a query type");
 
     QueryType m_query;
+
+    virtual BaseQuery* GetQuery()
+    {
+        return &m_query;
+    };
 };
 }  // namespace red
 #include "inl/System.inl"

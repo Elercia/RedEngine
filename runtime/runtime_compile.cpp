@@ -54,6 +54,7 @@
 #include "RedEngine/Entity/ComponentRegistry.hpp"
 #include "RedEngine/Entity/ComponentManager.hpp"
 #include "RedEngine/Entity/World.hpp"
+#include "RedEngine/Entity/SystemExecutionGraph.hpp"
 
 #include "RedEngine/Filesystem/FileSystemModule.hpp"
 #include "RedEngine/Filesystem/File.hpp"
@@ -138,6 +139,7 @@
 #include "Entity/ComponentRegistry.cpp"
 #include "Entity/ComponentManager.cpp"
 #include "Entity/World.cpp"
+#include "Entity/SystemExecutionGraph.cpp"
 
 #include "Filesystem/File.cpp"
 #include "Filesystem/Path.cpp"

@@ -86,6 +86,8 @@ void ThreadScheduler::Finalize()
 {
     m_scheduler->unbind();
     Thread::s_nextThreadId = 0;
+
+    delete m_scheduler;
 }
 
 int ThreadScheduler::GetWorkerCount() const

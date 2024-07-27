@@ -49,6 +49,13 @@ bool ExecutionNode::DependsOnRecursive(const ExecutionNode* other) const
     return false;
 }
 
+
+
+const String& ExecutionNode::GetName() const
+{
+    return m_name;
+}
+
 ExecutionGraph::ExecutionGraph() : m_bDirty(true)
 {
 }
@@ -194,8 +201,9 @@ void ExecutionGraph::Execute()
     for (uint32 i = 0; i < m_buckets.size(); i++)
     {
         auto* bucket = &m_buckets[i];
+        RedAssert(bucket->m_nodes.empty() == false);
 
-        bucket->group = red_new(WaitGroup, bucket->m_nodes.size());
+        WaitGroup wg(bucket->m_nodes.size());
 
         for (auto* node : bucket->m_nodes)
         {
@@ -203,13 +211,11 @@ void ExecutionGraph::Execute()
                 [=]() // By copy since it will be dispatched in multithread
                 {
                     node->m_func();
-                    bucket->group->Done();
+                    wg.Done();
                 });
         }
 
-        bucket->group->Wait();
-
-        red_delete(bucket->group);
+        wg.Wait();
     }
 }
 }  // namespace red
