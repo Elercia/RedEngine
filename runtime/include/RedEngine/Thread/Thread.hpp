@@ -22,6 +22,8 @@ public:
     int GetId() const;
     const char* GetName() const;
 
+    static void Sleep(uint32 ms);
+
 private:
     Thread(int threadId, const char* name);
 

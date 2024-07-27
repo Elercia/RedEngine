@@ -5,6 +5,12 @@
 
 #include <algorithm>
 
+#if defined RED_WINDOWS
+#include <Synchapi.h>
+#elif defined RED_LINUX
+#include <unistd.h>
+#endif
+
 namespace red
 {
 thread_local Thread sl_thread;
@@ -38,6 +44,15 @@ int Thread::GetId() const
 const char *Thread::GetName() const
 {
     return m_name;
+}
+
+void Thread::Sleep(uint32 ms)
+{
+#if defined RED_WINDOWS
+    ::Sleep(ms);
+#elif defined RED_LINUX
+    ::usleep(ms * 1000);
+#endif
 }
 
 ThreadScheduler::ThreadScheduler() : m_scheduler(nullptr)
