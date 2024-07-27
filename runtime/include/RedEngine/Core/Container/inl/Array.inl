@@ -614,4 +614,28 @@ constexpr T& ArrayView<T>::operator[](size_type index) const
     return m_offsetData[index];
 }
 
+template <typename T>
+typename ArrayView<T>::iterator ArrayView<T>::Find(const T& elem)
+{
+    for (iterator it = begin(); it != end(); ++it)
+    {
+        if (*it == elem)
+            return it;
+    }
+
+    return end();
+}
+
+template <typename T>
+typename ArrayView<T>::const_iterator ArrayView<T>::Find(const T& elem) const
+{
+    for (const_iterator it = begin(); it != end(); ++it)
+    {
+        if (*it == elem)
+            return it;
+    }
+
+    return end();
+}
+
 }  // namespace red

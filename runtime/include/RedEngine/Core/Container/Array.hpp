@@ -174,6 +174,9 @@ public:
     T& operator[](size_type index);
     constexpr T& operator[](size_type index) const;
 
+    iterator Find(const T& elem);
+    const_iterator Find(const T& elem) const;
+
 private:
     T* m_offsetData;
     size_type m_count;
