@@ -307,6 +307,39 @@ struct QueryWithoutExcludeComponents
 
 struct BaseQuery
 {
+    virtual ArrayView<const TypeTraits> GetExcludingComponentsTypeInfo() const = 0;
+    virtual ArrayView<const TypeTraits> GetIncludingComponentsTypeInfo() const = 0;
+    virtual ArrayView<const TypeTraits> GetReadingComponentsTypeInfo() const = 0;
+    virtual ArrayView<const TypeTraits> GetWritingComponentsTypeInfo() const = 0;
+
+    bool CanBeRunInParalleleWith(const BaseQuery* other) const
+    {
+        auto otherWritingComps = other->GetWritingComponentsTypeInfo();
+        auto otherReadingComps = other->GetReadingComponentsTypeInfo();
+
+        for (const auto& otherWritingComp : otherWritingComps)
+        {
+            if (GetWritingComponentsTypeInfo().Find(otherWritingComp) != GetWritingComponentsTypeInfo().end())
+            {
+                return false;
+            }
+
+            if (GetReadingComponentsTypeInfo().Find(otherWritingComp) != GetReadingComponentsTypeInfo().end())
+            {
+                return false;
+            }
+        }
+
+        for (const auto& otherReadingComp : otherReadingComps)
+        {
+            if (GetWritingComponentsTypeInfo().Find(otherReadingComp) != GetWritingComponentsTypeInfo().end())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 };
 
 template <typename... QueriesTypes>
@@ -323,6 +356,17 @@ struct Query : public BaseQuery,
     static_assert(sizeof...(QueriesTypes) > 0, "You should have a least one component inside a query !");
     static_assert(all_true<std::is_base_of<ComponentQuery, QueriesTypes>::value...>::value,
                   "System query made of something else than a component query type");
+
+    using WritingQueryType = std::conditional<GetWritingQueryCount<QueriesTypes...>() == 0, QueryWithoutWriteComponents,
+                                              QueryWithWriteComponents<QueriesTypes...>>::type;
+    using ReadingQueryType = std::conditional<GetReadingQueryCount<QueriesTypes...>() == 0, QueryWithoutReadComponents,
+                                              QueryWithReadComponents<QueriesTypes...>>::type;
+    using IncludingQueryType =
+        std::conditional<GetIncludeQueryCount<QueriesTypes...>() == 0, QueryWithoutIncludeComponents,
+                         QueryWithIncludeComponents<QueriesTypes...>>::type;
+    using ExcludingQueryType =
+        std::conditional<GetExcludeQueryCount<QueriesTypes...>() == 0, QueryWithoutExcludeComponents,
+                         QueryWithExcludeComponents<QueriesTypes...>>::type;
 
     using QueriedSingletonsTuple = decltype(GetQuerySingletonComponent<QueriesTypes...>());
     using QueriedComponentsTupleArray = Array<decltype(GetIncludedComponentTypeTuple<QueriesTypes...>())>;
@@ -341,6 +385,23 @@ struct Query : public BaseQuery,
         m_world->QueryComponents(components);
 
         return components;
+    }
+
+    ArrayView<const TypeTraits> GetExcludingComponentsTypeInfo() const override
+    {
+        return ExcludingQueryType::GetExcludingComponents();
+    }
+    ArrayView<const TypeTraits> GetIncludingComponentsTypeInfo() const override
+    {
+        return IncludingQueryType::GetIncludingComponents();
+    }
+    ArrayView<const TypeTraits> GetReadingComponentsTypeInfo() const override
+    {
+        return ReadingQueryType::GetReadingComponents();
+    }
+    ArrayView<const TypeTraits> GetWritingComponentsTypeInfo() const override
+    {
+        return WritingQueryType::GetWritingComponents();
     }
 
     World* m_world;
