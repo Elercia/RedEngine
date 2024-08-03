@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #if defined RED_WINDOWS
+#include <Windows.h>
 #include <Synchapi.h>
 #elif defined RED_LINUX
 #include <unistd.h>
