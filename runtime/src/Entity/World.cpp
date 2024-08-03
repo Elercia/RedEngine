@@ -1,6 +1,7 @@
 #include "RedEngine/Entity/World.hpp"
 
 #include "RedEngine/Entity/System.hpp"
+#include "RedEngine/Entity/SystemExecutionGraph.hpp"
 #include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Utils/Random.hpp"
 
@@ -9,12 +10,14 @@ namespace red
 World::World()
     : m_componentRegistry(red_new(ComponentRegistry))
     , m_componentManager(red_new(ComponentManager, m_componentRegistry))
+    , m_executionGraph(red_new(SystemExecutionGraph, this))
     , m_iCurrentEntityId(0)
 {
 }
 
 World::~World()
 {
+    red_delete(m_executionGraph);
     red_delete(m_componentManager);
     red_delete(m_componentRegistry);
 }
@@ -43,10 +46,12 @@ void World::Finalize()
 
 void World::Update()
 {
-    for (auto system : m_systems)
-    {
-        system->Update();
-    }
+    m_executionGraph->Execute();
+}
+
+SystemExecutionGraph* World::GetExecutionGraph()
+{
+    return m_executionGraph;
 }
 
 void World::AddSystem(BaseSystem* system, const TypeTraits& traits)

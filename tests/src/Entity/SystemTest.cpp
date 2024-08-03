@@ -166,11 +166,12 @@ TEST_CASE("System add/remove", "[ECS]")
     world.RegisterComponent<ReadComp>();
 
     world.AddSystemInitializer<TestInitializer>();
-    world.AddSystem<TestSystem>();
+    auto* sys = world.AddSystem<TestSystem>();
 
     world.Init();
-
-    world.Update();
+    
+    // can't call World::Update without creating a system execution graph
+    sys->Update();
 
     world.Finalize();
 

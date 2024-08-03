@@ -1,23 +1,30 @@
 
+#include "RedEngine/Core/Engine.hpp"
+
 #include "RedEngine/Core/CoreModule.hpp"
 
 #include "RedEngine/Audio/Component/AudioListener.hpp"
 #include "RedEngine/Audio/Component/AudioSource.hpp"
 #include "RedEngine/Audio/Component/AudioSubSystem.hpp"
 #include "RedEngine/Audio/Resource/SoundResourceLoader.hpp"
+#include "RedEngine/Audio/System/AudioSystem.hpp"
 #include "RedEngine/Core/Configuration/CVar.hpp"
 #include "RedEngine/Core/Configuration/CVarManager.hpp"
 #include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
-#include "RedEngine/Core/Engine.hpp"
+#include "RedEngine/Core/Debug/System/DebugSystem.hpp"
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
+#include "RedEngine/Core/Event/System/EventSystem.hpp"
 #include "RedEngine/Core/Time/FrameCounter.hpp"
 #include "RedEngine/Core/Time/Time.hpp"
+#include "RedEngine/Entity/SystemExecutionGraph.hpp"
 #include "RedEngine/Entity/Transform.hpp"
 #include "RedEngine/Entity/World.hpp"
 #include "RedEngine/Input/Component/UserInput.hpp"
+#include "RedEngine/Input/System/UserInputSystem.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 #include "RedEngine/Physics/Components/PhysicsWorld.hpp"
+#include "RedEngine/Physics/System/PhysicsSystem.hpp"
 #include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/Random.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"
@@ -103,6 +110,33 @@ bool Engine::RegisterComponentTypes()
 
 bool Engine::RegisterSystems()
 {
+    auto* graph = m_world->GetExecutionGraph();
+
+    // Audio
+    m_world->AddSystemInitializer<AudioInitializer>();
+
+    graph->AddSystem<UpdateAudioSourceSystem>().Before<UpdateAudioSubSystemSystem>();
+    graph->AddSystem<UpdateAudioListenerSystem>().Before<UpdateAudioSubSystemSystem>();
+    graph->AddSystem<UpdateAudioSubSystemSystem>();
+
+#ifdef RED_DEVBUILD
+    // Debug
+    m_world->AddSystemInitializer<DebugSystemInitializer>();
+    graph->AddSystem<DebugSystem>();
+#endif
+
+    // Input
+    // TODO Add system priority to make it the first thing to do in the frame ?
+    //  Or other system have to put it in dependancy ?
+    graph->AddSystem<EventSystem>();
+    graph->AddSystem<UserInputSystem>().After<EventSystem>();
+
+    // Physics
+    // TODO add system initializer for physics (create the B2 world)
+    graph->AddSystem<UpdatePhysicsFromEntitiesSystem>().Before<UpdatePhysicSystem>();
+    graph->AddSystem<UpdateEntitiesFromPhysicsSystem>().After<UpdatePhysicSystem>();
+    graph->AddSystem<UpdatePhysicSystem>();
+
     return true;
 }
 
@@ -168,7 +202,7 @@ bool Engine::Create()
     InitAllocator();
 
     RedAssert(m_world == nullptr);
-    m_world = new World;
+    m_world = red_new(World);
 
     RegisterComponentTypes();
     RegisterSystems();
@@ -200,7 +234,7 @@ bool Engine::Destroy()
 
     m_world->Finalize();
 
-    delete m_world;
+    red_delete(m_world);
 
     red_free(m_frameAllocator);
 

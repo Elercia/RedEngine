@@ -9,6 +9,7 @@ namespace red
 {
 class BaseSystem;
 class SystemInitializer;
+class SystemExecutionGraph;
 
 class World : Uncopyable, Unmovable
 {
@@ -50,6 +51,8 @@ public:
     template <typename COMP>
     COMP* AddComponentToEntity(EntityId id);
 
+    SystemExecutionGraph* GetExecutionGraph();
+
 private:
     void AddSystem(BaseSystem* system, const TypeTraits& traits);
     void RemoveSystem(const TypeTraits& traits);
@@ -63,6 +66,8 @@ private:
 
     Array<BaseSystem*> m_systems;
     Array<SystemInitializer*> m_systemInitializers;
+
+    SystemExecutionGraph* m_executionGraph;
 
     EntityId m_iCurrentEntityId;
 };

@@ -1,11 +1,10 @@
 #pragma once
 
 #include "RedEngine/Thread/ExecutionGraph.hpp"
+#include "RedEngine/Entity/World.hpp"
 
 namespace red
 {
-class World;
-
 class SystemExecutionNode : public ExecutionNode
 {
 public:

@@ -23,9 +23,13 @@ inline SystemExecutionNode& SystemExecutionGraph::AddSystem()
     constexpr auto typeInfo = TypeInfo<Sys>();
 
     auto* system = m_world->GetSystem<Sys>();
+    if (system == nullptr)
+    {
+        system = m_world->AddSystem<Sys>();
+    }
     RedAssert(system != nullptr);
 
-    auto& node = (SystemExecutionNode&)Node(typeInfo.name, [=]() { system->Update(); });
+    auto& node = (SystemExecutionNode&)Node(typeInfo.name, [=]() { ((BaseSystem*)system)->Update(); });
     node.m_system = system;
 
     return node;
