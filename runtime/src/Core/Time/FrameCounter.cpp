@@ -21,8 +21,8 @@ float FrameCounter::Update()
 
     float deltaTime = diff.count();
 
-    m_frameBuffer[m_currentFrameBufferIndex] = deltaTime;
-    m_currentFrameBufferIndex = (m_currentFrameBufferIndex + 1U) % m_frameBuffer.size();
+    m_frameBuffer[m_currentFrameBufferIndex % m_frameBuffer.size()] = deltaTime;
+    m_currentFrameBufferIndex = (m_currentFrameBufferIndex + 1U);
 
     _lastFrameTimePoint = currentTime;
 
@@ -30,6 +30,11 @@ float FrameCounter::Update()
                           m_frameBuffer.size();  // calculate the mean of delta times
 
     return meanDeltaTime;
+}
+
+uint64 FrameCounter::GetFrameIndex() const
+{
+    return m_currentFrameBufferIndex;
 }
 
 }  // namespace red

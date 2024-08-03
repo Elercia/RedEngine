@@ -3,6 +3,8 @@
 #include <array>
 #include <chrono>
 
+#include "RedEngine/Utils/Types.hpp"
+
 namespace red
 {
 constexpr uint8_t FrameCounterBufferSize = 10;
@@ -17,9 +19,11 @@ public:
 
     float Update();
 
+    uint64 GetFrameIndex() const;
+
 private:
     Clock::time_point _lastFrameTimePoint;
     std::array<float, FrameCounterBufferSize> m_frameBuffer;
-    uint8_t m_currentFrameBufferIndex = 0;
+    uint64 m_currentFrameBufferIndex = 0;
 };
 }  // namespace red
