@@ -13,24 +13,33 @@
 #define red_free(ptr)          red::MemoryProfiler::Free(ptr)
 
 #define red_new(T, ...) red::MemoryProfiler::New<T>(__LINE__, __FILE__, ##__VA_ARGS__)
-#define red_delete(ptr) red::MemoryProfiler::Delete(ptr)
+#define red_delete(ptr)                   \
+    {                                     \
+        red::MemoryProfiler::Delete(ptr); \
+        ptr = nullptr;                    \
+    }
+
 #else
 #define red_malloc(size)       std::malloc(size)
 #define red_realloc(ptr, size) std::realloc(ptr, size)
 #define red_free(ptr)          std::free(ptr)
 
 #define red_new(T, ...) new T(##__VA_ARGS__)
-#define red_delete(ptr) delete ptr
+#define red_delete(ptr) \
+    {                   \
+        delete ptr;     \
+        ptr = nullptr;  \
+    }
 #endif
 
-#define MemoryGuard (uint32) 0xBAADF00D
+#define MemoryGuard (uint32)0xBAADF00D
 
 namespace red
 {
 struct AllocationInfo
 {
     std::size_t size;
-    
+
 #ifdef RED_MEMORY_LEAK_TRACER
     int line;
     const char* file;
