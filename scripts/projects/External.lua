@@ -241,6 +241,7 @@ ExternalLibs("marl", true, "/marl/include")
 
 	files
 	{
+		marlSourcePath .. "/include/**.h",
 		marlSourcePath .. "/src/debug.cpp",
 		marlSourcePath .. "/src/memory.cpp",
 		marlSourcePath .. "/src/scheduler.cpp",
