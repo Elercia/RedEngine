@@ -25,6 +25,7 @@
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 #include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 #include "RedEngine/Physics/System/PhysicsSystem.hpp"
+#include "RedEngine/Rendering/Renderer.hpp"
 #include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/Random.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"
@@ -52,7 +53,7 @@ Engine* Engine::GetInstance()
     return s_engine;
 }
 
-Engine::Engine() : m_argc(0), m_argv(nullptr), m_world(nullptr), m_frameAllocator(nullptr)
+Engine::Engine() : m_argc(0), m_argv(nullptr), m_world(nullptr), m_renderer(nullptr), m_frameAllocator(nullptr)
 {
 }
 
@@ -204,6 +205,8 @@ bool Engine::Create()
     RedAssert(m_world == nullptr);
     m_world = red_new(World);
 
+    m_renderer = red_new(Renderer);
+
     RegisterComponentTypes();
     RegisterSystems();
 
@@ -219,8 +222,6 @@ bool Engine::Create()
     // resourceHolder->RegisterResourceLoader(ResourceType::FONT, new FontResourceLoader(m_world));
     // resourceHolder->RegisterResourceLoader(ResourceType::SHADER_PROGRAM, new ShaderProgramResourceLoader(m_world));
 
-    // m_world->BuildExecutionGraph();
-
     return true;
 }
 
@@ -235,6 +236,8 @@ bool Engine::Destroy()
     m_world->Finalize();
 
     red_delete(m_world);
+
+    red_delete(m_renderer);
 
     red_free(m_frameAllocator);
 
@@ -261,6 +264,11 @@ DoubleLinearAllocator& Engine::GetThreadFrameAllocator(int threadIndex)
 ThreadScheduler& Engine::GetScheduler()
 {
     return m_scheduler;
+}
+
+Renderer* Engine::GetRenderer()
+{
+    return m_renderer;
 }
 
 }  // namespace red

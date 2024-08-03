@@ -10,6 +10,7 @@
 namespace red
 {
 class World;
+class Renderer;
 
 constexpr uint32 RED_DEFAULT_FRAMEALLOCATOR_SIZE = 50 * 1024 * 1024;  // 10 Mo
 
@@ -42,11 +43,15 @@ public:
 
     ThreadScheduler& GetScheduler();
 
+    Renderer* GetRenderer();
+
 protected:
     int m_argc;
     char** m_argv;
 
     World* m_world;
+
+    Renderer* m_renderer;
 
     DoubleLinearAllocator* m_frameAllocator;  // dynamic array initialized when the threading system is init
 
