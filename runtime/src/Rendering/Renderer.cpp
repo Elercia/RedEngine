@@ -47,8 +47,8 @@ bool ShaderProgram::Init(ArrayView<uint8> vertexCode, ArrayView<uint8> pixelCode
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
     {
-        char* dataPtr = (char*)vertexCode.data();
-        int dataLength = vertexCode.size();
+        char* dataPtr = (char*)pixelCode.data();
+        int dataLength = pixelCode.size();
         glShaderSource(fragmentShader, 1, &dataPtr, &dataLength);
         glCompileShader(fragmentShader);
     }
@@ -61,6 +61,8 @@ bool ShaderProgram::Init(ArrayView<uint8> vertexCode, ArrayView<uint8> pixelCode
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    return true;
 }
 
 void ShaderProgram::Finalize()

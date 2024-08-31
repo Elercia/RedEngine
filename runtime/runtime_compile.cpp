@@ -82,6 +82,7 @@
 #include "RedEngine/Physics/System/PhysicsSystem.hpp"
 
 #include "RedEngine/Rendering/Color.hpp"
+#include "RedEngine/Rendering/Renderer.hpp"
 
 #include "RedEngine/Resources/ResourceModule.hpp"
 #include "RedEngine/Resources/Resource.hpp"
@@ -157,6 +158,8 @@
 #include "Physics/ContactInfo.cpp"
 #include "Physics/Components/PhysicsWorld.cpp"
 #include "Physics/System/PhysicSystem.cpp"
+
+#include "Rendering/Renderer.cpp"
 
 #include "Resources/Resource.cpp"
 #include "Resources/ResourceHolderComponent.cpp"
