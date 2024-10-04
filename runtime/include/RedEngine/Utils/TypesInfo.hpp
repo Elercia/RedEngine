@@ -28,6 +28,8 @@ struct TypeTraits
     }
 };
 
+static_assert(std::is_trivially_destructible<TypeTraits>::value, "TypeTraits must be trivially_destructible");
+
 constexpr TypeTraits EmptyTypeTraits{"invalid", (uint32) -1};
 
 #if defined(_MSC_VER) && !defined(__clang__)
