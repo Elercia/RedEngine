@@ -1,5 +1,7 @@
 #include "RedEngine/Core/Memory/PoolAllocator.hpp"
 
+#include "RedEngine/Core/CoreModule.hpp"
+
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 
 namespace red

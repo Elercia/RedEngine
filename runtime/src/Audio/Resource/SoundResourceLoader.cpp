@@ -1,7 +1,5 @@
 #include "RedEngine/Audio/Resource/SoundResourceLoader.hpp"
 
-#include "RedEngine/Audio/AudioModule.hpp"
-
 #include "RedEngine/Audio/AudioUtils.hpp"
 #include "RedEngine/Audio/System/AudioSystem.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"

@@ -1,7 +1,5 @@
 #include "RedEngine/Utils/Random.hpp"
 
-#include "RedEngine/Utils/UtilityModule.hpp"
-
 namespace red
 {
 static uint64 s_state = 1;
@@ -31,14 +29,14 @@ uint64 RandomUint64()
 
 uint32 RandomRange(uint32 min, uint32 max)
 {
-    const auto fRandValue = (float) RandomUint32() / (float) UINT_MAX;
+    const auto fRandValue = (float) RandomUint32() / (float) RED_UINT32_MAX;
 
     return (uint32)(fRandValue * (max-min)) + min;
 }
 
 float RandomFloatRange(float min, float max)
 {
-    const auto fRandValue = (float) RandomUint32() / (float) UINT_MAX;
+    const auto fRandValue = (float) RandomUint32() / (float) RED_UINT32_MAX;
     return ( fRandValue * (max - min)) + min;
 }
 }  // namespace red

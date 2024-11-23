@@ -1,6 +1,6 @@
 #include "RedEngine/Core/Debug/System/DebugSystem.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Debug/DebugModule.hpp"
 
 #include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
@@ -145,7 +145,7 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false,
                       ImGuiWindowFlags_HorizontalScrollbar);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));  // Tighten spacing
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
     const auto& logs = debug->GetLogBuffer();
     for (const auto& log : logs)
@@ -179,7 +179,7 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
 
         ImGui::TextUnformatted(log.str.c_str());
 
-        if (ImGui::IsItemClicked(0))  // TODO not working
+        if (ImGui::IsItemClicked(0)) // TODO not working
         {
             if (ImGui::BeginPopupContextWindow())
             {
@@ -218,7 +218,7 @@ void DebugSystem::RenderConsole(DebugComponent* debug)
     // Auto-focus on window apparition
     ImGui::SetItemDefaultFocus();
     if (reclaimFocus)
-        ImGui::SetKeyboardFocusHere(-1);  // Auto focus previous widget
+        ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 }
 
 void DebugSystem::Update()
@@ -410,4 +410,4 @@ void DebugSystem::RenderDebugPhysicsControls(DebugComponent* /*debug*/)
     if (debug->m_physicsDebugDrawer != nullptr)
         debug->m_physicsDebugDrawer->SetFlags(flagValue);*/
 }
-}  // namespace red
+} // namespace red

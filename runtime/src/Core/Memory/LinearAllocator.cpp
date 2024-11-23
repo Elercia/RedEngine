@@ -1,5 +1,7 @@
 #include "RedEngine/Core/Memory/LinearAllocator.hpp"
 
+#include "RedEngine/Core/CoreModule.hpp"
+
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Core/Engine.hpp"
 #include "RedEngine/Core/Memory/MemoryProfiler.hpp"

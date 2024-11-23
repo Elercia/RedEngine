@@ -1,6 +1,6 @@
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Event/EventModule.hpp"
 
 #include "RedEngine/Input/InputDefinitionTranslationUnit.hpp"
 

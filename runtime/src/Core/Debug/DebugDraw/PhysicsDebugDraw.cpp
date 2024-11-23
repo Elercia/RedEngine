@@ -1,6 +1,6 @@
 #include "RedEngine/Core/Debug/DebugDraw/PhysicsDebugDraw.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Debug/DebugModule.hpp"
 
 #include "RedEngine/Core/Container/Array.hpp"
 #include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
@@ -9,7 +9,8 @@
 
 namespace red
 {
-PhysicsDebugDrawer::PhysicsDebugDrawer(DebugComponent* debugComponent) : m_debugComponent(debugComponent)
+PhysicsDebugDrawer::PhysicsDebugDrawer(DebugComponent* debugComponent)
+    : m_debugComponent(debugComponent)
 {
 }
 
@@ -51,7 +52,7 @@ void PhysicsDebugDrawer::DrawSolidCircle(const b2Vec2& center, float radius, con
                                          const b2Color& color)
 {
     //m_debugComponent->AddCircle(ConvertFromPhysicsVector(center), ConvertFromPhysicsDistance(radius),
-     //                           Color(color.r, color.g, color.b));
+    //                           Color(color.r, color.g, color.b));
 }
 
 void PhysicsDebugDrawer::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -69,5 +70,4 @@ void PhysicsDebugDrawer::DrawPoint(const b2Vec2& p, float /*size*/, const b2Colo
 {
     //m_debugComponent->AddPoint(ConvertFromPhysicsVector(p), Color(color.r, color.g, color.b));
 }
-
-}  // namespace red
+} // namespace red

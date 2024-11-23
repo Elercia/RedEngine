@@ -1,5 +1,7 @@
 #include "RedEngine/Thread/Thread.hpp"
 
+#include "RedEngine/Thread/ThreadModule.hpp"
+
 #include "RedEngine/Core/Configuration/CVar.hpp"
 #include "RedEngine/Core/Debug/Profiler.hpp"
 

@@ -2,6 +2,7 @@
 
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Core/Memory/LinearAllocator.hpp"
+#include "RedEngine/Core/Memory/MemoryUtils.hpp"
 #include "RedEngine/Thread/Thread.hpp"
 
 #include "RedEngine/Core/Container/String.hpp"
@@ -12,7 +13,7 @@ namespace red
 class World;
 class Renderer;
 
-constexpr uint32 RED_DEFAULT_FRAMEALLOCATOR_SIZE = 50 * 1024 * 1024;  // 10 Mo
+constexpr uint32 RED_DEFAULT_FRAMEALLOCATOR_SIZE = 50 * RED_MiB;
 
 class Engine
 {

@@ -22,7 +22,8 @@ String ICVar::GetLongName() const
 }
 
 ICVar::ICVar(const String& name, const String& category)
-    : m_name(name), m_category(category)
+    : m_name(name)
+    , m_category(category)
 {
 }
 
@@ -30,4 +31,4 @@ void ICVar::ChangeValueFromString(const String& str)
 {
     m_deserializationFunction(str);
 }
-}  // namespace red
+} // namespace red

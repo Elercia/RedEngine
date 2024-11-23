@@ -1,7 +1,5 @@
 #include "RedEngine/Utils/StringUtils.hpp"
 
-#include "RedEngine/Utils/UtilityModule.hpp"
-
 #include "RedEngine/Core/Container/Array.hpp"
 
 #include <algorithm>

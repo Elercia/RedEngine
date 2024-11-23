@@ -1,6 +1,7 @@
 #pragma once
 
 #define RED_USE_ARRAY
+#include "RedEngine/Core/Memory/GeneralAllocator.hpp"
 #ifdef RED_USE_ARRAY
 
 #include "RedEngine/Core/Debug/DebugMacros.hpp"
@@ -15,13 +16,6 @@
 
 namespace red
 {
-struct DefaultAllocator
-{
-    inline void* Allocate(uint32 size);
-    inline void Free(void* ptr);
-    inline void* Realloc(void* ptr, uint32 oldSize, uint32 size);
-};
-
 template <typename T, typename Allocator = DefaultAllocator>
 class Array
 {

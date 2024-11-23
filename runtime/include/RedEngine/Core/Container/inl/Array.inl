@@ -2,22 +2,6 @@
 namespace red
 {
 #ifdef RED_USE_ARRAY
-
-void* DefaultAllocator ::Allocate(uint32 size)
-{
-    return red_malloc(size);
-}
-
-void DefaultAllocator::Free(void* ptr)
-{
-    red_free(ptr);
-}
-
-void* DefaultAllocator::Realloc(void* ptr, uint32 /*oldSize*/, uint32 size)
-{
-    return red_realloc(ptr, size);
-}
-
 template <typename T, typename Allocator>
 Array<T, Allocator>::Array() : m_allocator(), m_size(0), m_capacity(0), m_data(nullptr)
 {

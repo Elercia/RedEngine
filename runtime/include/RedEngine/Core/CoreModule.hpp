@@ -1,12 +1,6 @@
 #pragma once
 
-#include "RedEngine/Core/Debug/DebugMacros.hpp"
-#include "RedEngine/Core/Debug/Logger/Logger.hpp"
-#include "RedEngine/Core/Debug/Profiler.hpp"
-#include "RedEngine/Core/Macros.hpp"
-#include "RedEngine/Core/Memory/Macros.hpp"
-
-namespace red
-{
-
-}  // namespace red
+#ifdef RED_MODULE_NAME
+#undef RED_MODULE_NAME
+#endif
+#define RED_MODULE_NAME "Core"

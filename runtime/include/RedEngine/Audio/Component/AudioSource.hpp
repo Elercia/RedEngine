@@ -2,6 +2,8 @@
 
 #include "RedEngine/Audio/AudioEvent.hpp"
 
+#include <memory>
+
 namespace FMOD
 {
 class Channel;

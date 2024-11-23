@@ -1,5 +1,7 @@
 #include "RedEngine/Rendering/Renderer.hpp"
 
+#include "RedEngine/Rendering/RenderingModule.hpp"
+
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 
 #include <GL/gl3w.h>
@@ -71,8 +73,8 @@ void ShaderProgram::Finalize()
     m_handle = 0;
 }
 
-void OpenGlDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                const GLchar* message, const void* userParam)
+void OpenGlDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/,
+                                const GLchar* message, const void* /*userParam*/)
 {
     const char* _source;
     const char* _type;

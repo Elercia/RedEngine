@@ -3,7 +3,7 @@ namespace red
 template <typename T, typename... Args>
 T* MemoryProfiler::New(int line, const char* file, Args... args)
 {
-    return new (Allocate(sizeof(T), line, file)) T(std::forward<Args>(args)...);
+    return new (Allocate(sizeof(T), line, file, RED_MODULE_NAME)) T(std::forward<Args>(args)...);
 }
 
 template <typename T>

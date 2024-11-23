@@ -121,5 +121,4 @@ void UpdateAudioSubSystemSystem::Update()
     auto audioSubSystem = std::get<AudioSubSystem*>(m_query.GetSingletonComponents());
     audioSubSystem->m_studioSystem->update();
 }
-
-}  // namespace red
+} // namespace red

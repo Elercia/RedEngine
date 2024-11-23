@@ -1,4 +1,3 @@
-
 #include "RedEngine/Core/Engine.hpp"
 
 #include "RedEngine/Core/CoreModule.hpp"
@@ -30,6 +29,9 @@
 #include "RedEngine/Utils/Random.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"
 
+#include "RedEngine/Core/Debug/Profiler.hpp"
+
+
 #ifdef RED_WINDOWS
 #define NOMINMAX 1
 #include <windows.h>
@@ -53,7 +55,12 @@ Engine* Engine::GetInstance()
     return s_engine;
 }
 
-Engine::Engine() : m_argc(0), m_argv(nullptr), m_world(nullptr), m_renderer(nullptr), m_frameAllocator(nullptr)
+Engine::Engine()
+    : m_argc(0)
+    , m_argv(nullptr)
+    , m_world(nullptr)
+    , m_renderer(nullptr)
+    , m_frameAllocator(nullptr)
 {
 }
 
@@ -183,7 +190,7 @@ void Engine::InitAllocator()
 
     for (int i = 0; i < workerCount; i++)
     {
-        new (m_frameAllocator + i) DoubleLinearAllocator(RED_DEFAULT_FRAMEALLOCATOR_SIZE);
+        new(m_frameAllocator + i) DoubleLinearAllocator(RED_DEFAULT_FRAMEALLOCATOR_SIZE);
     }
 }
 
@@ -270,5 +277,4 @@ Renderer* Engine::GetRenderer()
 {
     return m_renderer;
 }
-
-}  // namespace red
+} // namespace red

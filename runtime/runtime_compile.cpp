@@ -1,5 +1,4 @@
 // Headers
-#include "RedEngine/Audio/AudioModule.hpp"
 #include "RedEngine/Audio/AudioEvent.hpp"
 #include "RedEngine/Audio/AudioUtils.hpp"
 #include "RedEngine/Audio/Component/AudioSubSystem.hpp"
@@ -9,12 +8,16 @@
 #include "RedEngine/Audio/Resource/SoundResourceLoader.hpp"
 #include "RedEngine/Audio/System/AudioSystem.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
 #include "RedEngine/Core/Configuration/CVar.hpp"
 #include "RedEngine/Core/Configuration/CVarManager.hpp"
 #include "RedEngine/Core/Configuration/CVarUtils.hpp"
 #include "RedEngine/Core/Configuration/IniReader.hpp"
 #include "RedEngine/Core/Configuration/UserInputHelper.hpp"
+#include "RedEngine/Core/Macros.hpp"
+#include "RedEngine/Core/Engine.hpp"
+#include "RedEngine/Core/SerializationFunctions.hpp"
+#include "RedEngine/Core/Time/FrameCounter.hpp"
+#include "RedEngine/Core/Time/Time.hpp"
 
 #include "RedEngine/Core/Container/Array.hpp"
 #include "RedEngine/Core/Container/Map.hpp"
@@ -27,25 +30,17 @@
 #include "RedEngine/Core/Debug/Profiler.hpp"
 #include "RedEngine/Core/Debug/System/DebugSystem.hpp"
 
-#include "RedEngine/Core/Engine.hpp"
-
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 #include "RedEngine/Core/Event/Delegate.hpp"
 #include "RedEngine/Core/Event/Signal.hpp"
 #include "RedEngine/Core/Event/System/EventSystem.hpp"
-
-#include "RedEngine/Core/Macros.hpp"
 
 #include "RedEngine/Core/Memory/LinearAllocator.hpp"
 #include "RedEngine/Core/Memory/Macros.hpp"
 #include "RedEngine/Core/Memory/MemoryProfiler.hpp"
 #include "RedEngine/Core/Memory/MemoryUtils.hpp"
 #include "RedEngine/Core/Memory/PoolAllocator.hpp"
-
-#include "RedEngine/Core/SerializationFunctions.hpp"
-
-#include "RedEngine/Core/Time/FrameCounter.hpp"
-#include "RedEngine/Core/Time/Time.hpp"
+#include "RedEngine/Core/Memory/GeneralAllocator.hpp"
 
 #include "RedEngine/Entity/Entity.hpp"
 #include "RedEngine/Entity/SystemQuery.hpp"
@@ -56,18 +51,15 @@
 #include "RedEngine/Entity/World.hpp"
 #include "RedEngine/Entity/SystemExecutionGraph.hpp"
 
-#include "RedEngine/Filesystem/FileSystemModule.hpp"
 #include "RedEngine/Filesystem/File.hpp"
 #include "RedEngine/Filesystem/Path.hpp"
 
-#include "RedEngine/Input/InputModule.hpp"
 #include "RedEngine/Input/Component/UserInput.hpp"
 #include "RedEngine/Input/InputDefinition.hpp"
 #include "RedEngine/Input/InputDefinitionTranslationUnit.hpp"
 #include "RedEngine/Input/System/UserInputSystem.hpp"
 #include "RedEngine/Input/UserInputDefinition.hpp"
 
-#include "RedEngine/Math/MathModule.hpp"
 #include "RedEngine/Math/AABB.hpp"
 #include "RedEngine/Math/Hash.hpp"
 #include "RedEngine/Math/Math.hpp"
@@ -75,7 +67,6 @@
 #include "RedEngine/Math/MatrixFunctions.hpp"
 #include "RedEngine/Math/Vector.hpp"
 
-#include "RedEngine/Physics/PhysicsModule.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 #include "RedEngine/Physics/ContactInfo.hpp"
 #include "RedEngine/Physics/Components/PhysicsWorld.hpp"
@@ -84,7 +75,6 @@
 #include "RedEngine/Rendering/Color.hpp"
 #include "RedEngine/Rendering/Renderer.hpp"
 
-#include "RedEngine/Resources/ResourceModule.hpp"
 #include "RedEngine/Resources/Resource.hpp"
 #include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Resources/ResourceLoader.hpp"
@@ -92,7 +82,6 @@
 #include "RedEngine/Thread/ExecutionGraph.hpp"
 #include "RedEngine/Thread/Thread.hpp"
 
-#include "RedEngine/Utils/UtilityModule.hpp"
 #include "RedEngine/Utils/BitfieldUtils.hpp"
 #include "RedEngine/Utils/FileUtils.hpp"
 #include "RedEngine/Utils/Random.hpp"
@@ -114,14 +103,16 @@
 #include "Core/Configuration/CVarManager.cpp"
 #include "Core/Configuration/CVarUtils.cpp"
 #include "Core/Configuration/IniReader.cpp"
+#include "Core/Engine.cpp"
+#include "Core/SerializationFunctions.cpp"
+#include "Core/Time/FrameCounter.cpp"
+#include "Core/Time/Time.cpp"
 
 #include "Core/Debug/Component/DebugComponent.cpp"
 #include "Core/Debug/DebugDraw/PhysicsDebugDraw.cpp"
 #include "Core/Debug/DebugMacros.cpp"
 #include "Core/Debug/Logger/Logger.cpp"
 #include "Core/Debug/System/DebugSystem.cpp"
-
-#include "Core/Engine.cpp"
 
 #include "Core/Event/Component/EventsComponent.cpp"
 #include "Core/Event/Delegate.cpp"
@@ -131,11 +122,7 @@
 #include "Core/Memory/MemoryProfiler.cpp"
 #include "Core/Memory/MemoryUtils.cpp"
 #include "Core/Memory/PoolAllocator.cpp"
-
-#include "Core/SerializationFunctions.cpp"
-
-#include "Core/Time/FrameCounter.cpp"
-#include "Core/Time/Time.cpp"
+#include "Core/Memory/GeneralAllocator.cpp"
 
 #include "Entity/ComponentRegistry.cpp"
 #include "Entity/ComponentManager.cpp"

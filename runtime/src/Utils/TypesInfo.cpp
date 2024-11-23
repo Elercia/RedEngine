@@ -1,1 +1,6 @@
-#include "RedEngine/Utils/UtilityModule.hpp"
+#include "RedEngine/Utils/TypesInfo.hpp"
+
+namespace red
+{
+
+}

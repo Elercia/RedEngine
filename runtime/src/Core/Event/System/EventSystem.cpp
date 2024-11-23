@@ -1,8 +1,9 @@
 #include "RedEngine/Core/Event/System/EventSystem.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Event/EventModule.hpp"
 
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
+#include "RedEngine/Core/Debug/Profiler.hpp"
 #include "RedEngine/Core/Event/Component/EventsComponent.hpp"
 #include "RedEngine/Input/InputDefinitionTranslationUnit.hpp"
 

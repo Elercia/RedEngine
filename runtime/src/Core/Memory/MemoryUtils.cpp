@@ -1,5 +1,7 @@
 #include "RedEngine/Core/Memory/MemoryUtils.hpp"
 
+#include "RedEngine/Core/CoreModule.hpp"
+
 #include "RedEngine/Core/Debug/DebugMacros.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"

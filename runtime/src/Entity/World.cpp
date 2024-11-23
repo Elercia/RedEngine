@@ -1,5 +1,7 @@
 #include "RedEngine/Entity/World.hpp"
 
+#include "RedEngine/Entity/EntityModule.hpp"
+
 #include "RedEngine/Entity/System.hpp"
 #include "RedEngine/Entity/SystemExecutionGraph.hpp"
 #include "RedEngine/Entity/Transform.hpp"

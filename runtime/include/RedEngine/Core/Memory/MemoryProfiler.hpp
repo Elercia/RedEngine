@@ -2,15 +2,18 @@
 
 #include "RedEngine/Utils/Types.hpp"
 
-#include <array>
-#include <cstddef>
+#include <utility>
 
-#define RED_MEMORY_PROFILER
+#ifndef RED_MODULE_NAME
+#define RED_MODULE_NAME "RedEngine"
+#endif
 
-#ifdef RED_MEMORY_PROFILER
-#define red_malloc(size)       red::MemoryProfiler::Allocate(size, __LINE__, __FILE__)
-#define red_realloc(ptr, size) red::MemoryProfiler::Realloc(ptr, size, __LINE__, __FILE__)
+#define red_malloc(size)       red::MemoryProfiler::Allocate(size, __LINE__, __FILE__, RED_MODULE_NAME)
+#define red_realloc(ptr, size) red::MemoryProfiler::Realloc(ptr, size, __LINE__, __FILE__, RED_MODULE_NAME)
 #define red_free(ptr)          red::MemoryProfiler::Free(ptr)
+
+#define red_frame_malloc(size)  red::MemoryProfiler::FrameAllocate(size, __LINE__, __FILE__, RED_MODULE_NAME)
+#define red_frame_realloc(size) red::MemoryProfiler::FrameRealloc(ptr, size, __LINE__, __FILE__, RED_MODULE_NAME)
 
 #define red_new(T, ...) red::MemoryProfiler::New<T>(__LINE__, __FILE__, ##__VA_ARGS__)
 #define red_delete(ptr)                   \
@@ -19,26 +22,14 @@
         ptr = nullptr;                    \
     }
 
-#else
-#define red_malloc(size)       std::malloc(size)
-#define red_realloc(ptr, size) std::realloc(ptr, size)
-#define red_free(ptr)          std::free(ptr)
-
-#define red_new(T, ...) new T(##__VA_ARGS__)
-#define red_delete(ptr) \
-    {                   \
-        delete ptr;     \
-        ptr = nullptr;  \
-    }
-#endif
-
 #define MemoryGuard (uint32)0xBAADF00D
 
 namespace red
 {
 struct AllocationInfo
 {
-    std::size_t size;
+    uint64 size;
+    const char* moduleName;
 
 #ifdef RED_MEMORY_LEAK_TRACER
     int line;
@@ -61,9 +52,12 @@ struct MemoryUsageInfo
 class MemoryProfiler
 {
 public:
-    static void* Allocate(sizet size, int line, const char* file);
-    static void* Realloc(void* ptr, sizet size, int line, const char* file);
+    static void* Allocate(sizet size, int line, const char* file, const char* moduleName);
+    static void* Realloc(void* ptr, sizet size, int line, const char* file, const char* moduleName);
     static void Free(void* ptr);
+
+    static void* FrameAllocate(sizet size, int line, const char* file, const char* moduleName);
+    static void* FrameRealloc(void* ptr, sizet size, int line, const char* file, const char* moduleName);
 
     template <typename T, typename... Args>
     static T* New(int line, const char* file, Args... args);

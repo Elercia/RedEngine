@@ -1,4 +1,3 @@
-#include "RedEngine/Math/MathModule.hpp"
 
 #include "RedEngine/Core/Debug/DebugMacros.hpp"
 #include "RedEngine/Core/SerializationFunctions.hpp"

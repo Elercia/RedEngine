@@ -1,6 +1,9 @@
 #include "RedEngine/Core/Memory/MemoryProfiler.hpp"
 
+#include "RedEngine/Core/CoreModule.hpp"
+
 #include "RedEngine/Math/Math.hpp"
+#include "RedEngine/Core/Engine.hpp"
 
 #include <iostream>
 
@@ -11,7 +14,7 @@ AllocationInfo* MemoryProfiler::s_rootAllocation = nullptr;
 #endif
 MemoryUsageInfo MemoryProfiler::s_memoryUsage;
 
-void* MemoryProfiler::Allocate(sizet size, [[maybe_unused]] int line, [[maybe_unused]] const char* file)
+void* MemoryProfiler::Allocate(sizet size, [[maybe_unused]] int line, [[maybe_unused]] const char* file, const char* moduleName)
 {
     if (size == 0)
     {
@@ -24,6 +27,7 @@ void* MemoryProfiler::Allocate(sizet size, [[maybe_unused]] int line, [[maybe_un
     AllocationInfo* allocInfo = (AllocationInfo*) ptr;
     InitAllocInfo(allocInfo);
     allocInfo->size = size;
+    allocInfo->moduleName = moduleName;
 
 #ifdef RED_MEMORY_LEAK_TRACER
     allocInfo->previous = nullptr;
@@ -50,10 +54,10 @@ void* MemoryProfiler::Allocate(sizet size, [[maybe_unused]] int line, [[maybe_un
     return (void*) (&allocInfo[1]);
 }
 
-void* MemoryProfiler::Realloc(void* ptr, sizet size, int line, const char* file)
+void* MemoryProfiler::Realloc(void* ptr, sizet size, int line, const char* file, const char* moduleName)
 {
     if (ptr == nullptr)
-        return Allocate(size, line, file);
+        return Allocate(size, line, file, moduleName);
 
     if (size == 0)
     {
@@ -69,6 +73,7 @@ void* MemoryProfiler::Realloc(void* ptr, sizet size, int line, const char* file)
     AllocationInfo* newAlloc = (AllocationInfo*) std::realloc(allocInfo, realSize);
     InitAllocInfo(newAlloc);
     newAlloc->size = size;
+    newAlloc->moduleName = moduleName;
 
     s_memoryUsage.currentlyAllocated += newAlloc->size;
     s_memoryUsage.peekAllocated = Math::Max(s_memoryUsage.peekAllocated, s_memoryUsage.currentlyAllocated);
@@ -146,6 +151,16 @@ void MemoryProfiler::Free(void* ptr)
     s_memoryUsage.currentlyAllocated -= allocInfo->size;
 
     std::free(allocInfo);
+}
+
+void* MemoryProfiler::FrameAllocate(sizet size, int /*line*/, const char* /*file*/, const char* /*moduleName*/)
+{
+    return Engine::GetInstance()->GetThreadFrameAllocator(Thread::GetCurrentThread().GetId()).Allocate(size, 1);
+}
+
+void* MemoryProfiler::FrameRealloc(void* /*ptr*/, sizet size, int /*line*/, const char* /*file*/, const char* /*moduleName*/)
+{
+    return Engine::GetInstance()->GetThreadFrameAllocator(Thread::GetCurrentThread().GetId()).Allocate(size, 1);
 }
 
 MemoryUsageInfo MemoryProfiler::GetUsage()

@@ -1,10 +1,11 @@
+#include "RedEngine/Physics/System/PhysicsSystem.hpp"
+
 #include "RedEngine/Physics/PhysicsModule.hpp"
 
 #include "RedEngine/Core/Debug/Profiler.hpp"
 #include "RedEngine/Core/Engine.hpp"
 #include "RedEngine/Physics/Components/PhysicBody.hpp"
 #include "RedEngine/Physics/ContactInfo.hpp"
-#include "RedEngine/Physics/System/PhysicsSystem.hpp"
 
 #include <box2d/b2_contact.h>
 
@@ -92,7 +93,7 @@ void UpdateEntitiesFromPhysicsSystem::ManageCollisions()
 
     for (const auto& constCollision : physicsWorld->GetCollisions())
     {
-        auto collision = constCollision;  // copy
+        auto collision = constCollision; // copy
 
         collision.firstPhysicBody->m_collisionSignal.emit(collision);
 
@@ -112,7 +113,7 @@ void UpdateEntitiesFromPhysicsSystem::ManageTriggers()
 
     for (const auto& constTrigger : triggers)
     {
-        auto triggerInfo = constTrigger;  // copy
+        auto triggerInfo = constTrigger; // copy
 
         triggerInfo.firstPhysicBody->m_triggerSignal(triggerInfo);
 
@@ -121,4 +122,4 @@ void UpdateEntitiesFromPhysicsSystem::ManageTriggers()
         triggerInfo.secondPhysicBody->m_triggerSignal(triggerInfo);
     }
 }
-}  // namespace red
+} // namespace red

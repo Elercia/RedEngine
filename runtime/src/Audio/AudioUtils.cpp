@@ -48,5 +48,4 @@ Vector2 FmodUtils::Convert(const FMOD_VECTOR& fmodVector)
     FmodUtils::ConvertRef(vec, fmodVector);
     return vec;
 }
-
-}  // namespace red
+} // namespace red

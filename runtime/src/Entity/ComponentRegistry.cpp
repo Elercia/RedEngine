@@ -1,5 +1,7 @@
 #include "RedEngine/Entity/ComponentRegistry.hpp"
 
+#include "RedEngine/Entity/EntityModule.hpp"
+
 namespace red
 {
 bool ComponentRegistry::RegisterComponent(TypeTraits traits, bool isSingleton, uint32 size,

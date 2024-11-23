@@ -1,6 +1,6 @@
 #include "RedEngine/Core/Debug/Component/DebugComponent.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Debug/DebugModule.hpp"
 
 #include "RedEngine/Core/Debug/DebugDraw/PhysicsDebugDraw.hpp"
 #include "RedEngine/Entity/Entity.hpp"
@@ -8,7 +8,8 @@
 
 namespace red
 {
-DebugComponent::DebugComponent() : m_physicsDebugDrawer(nullptr)
+DebugComponent::DebugComponent()
+    : m_physicsDebugDrawer(nullptr)
 {
 }
 
@@ -68,4 +69,4 @@ Array<Entity*>& DebugComponent::GetFilteredEntities()
 {
     return m_filteredEntities;
 }
-}  // namespace red
+} // namespace red

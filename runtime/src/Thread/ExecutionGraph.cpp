@@ -1,5 +1,7 @@
 #include "RedEngine/Thread/ExecutionGraph.hpp"
 
+#include "RedEngine/Thread/ThreadModule.hpp"
+
 #include "RedEngine/Core/Debug/DebugMacros.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Core/Engine.hpp"

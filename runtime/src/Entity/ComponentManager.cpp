@@ -1,5 +1,7 @@
 #include "RedEngine/Entity/ComponentManager.hpp"
 
+#include "RedEngine/Entity/EntityModule.hpp"
+
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Entity/ComponentRegistry.hpp"
 

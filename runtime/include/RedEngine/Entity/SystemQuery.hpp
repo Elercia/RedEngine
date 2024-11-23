@@ -6,6 +6,8 @@
 #include "RedEngine/Utils/Tuple.hpp"
 #include "RedEngine/Utils/TypesInfo.hpp"
 
+#include <array>
+
 namespace red
 {
 

@@ -2,6 +2,10 @@
 
 #include "RedEngine/Utils/Types.hpp"
 
+#define RED_KiB 1024llu
+#define RED_MiB RED_KiB * 1024llu
+#define RED_GiB RED_MB * 1024llu
+
 namespace red
 {
 struct PageAllocation

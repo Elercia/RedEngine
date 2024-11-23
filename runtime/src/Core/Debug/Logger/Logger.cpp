@@ -1,6 +1,6 @@
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 
-#include "RedEngine/Core/CoreModule.hpp"
+#include "RedEngine/Core/Debug/DebugModule.hpp"
 
 #include "RedEngine/Core/SerializationFunctions.hpp"
 
