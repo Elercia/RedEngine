@@ -37,6 +37,7 @@ RedEngineLib("RedEngineLib_AllFiles")
 	files
 	{
 		runtimePath .. "/include/**.hpp",
+		runtimePath .. "/include/**.inl",
 		runtimePath .. "/src/**.cpp",
 	}
 
