@@ -1,4 +1,4 @@
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
+#include "RedEngine/Resources/ResourceLoader.hpp"
 
 #include <catch2/catch.hpp>
 

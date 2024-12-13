@@ -9,12 +9,7 @@ class world;
 
 class SoundResourceLoader : public ResourceLoader<SoundResource>
 {
-public:
-    SoundResourceLoader(World* world);
-    ~SoundResourceLoader();
-
-    void FinalizeResource(std::shared_ptr<SoundResource> resource);
-    bool InitResource(std::shared_ptr<SoundResource>& resource, const Path& path, nlohmann::json jsonContent);
+    void FinalizeResource(std::shared_ptr<SoundResource> resource) override;
+    bool InitResource(std::shared_ptr<SoundResource>& resource, const Path& path, const Json& jsonContent) override;
 };
-
-}  // namespace red
+} // namespace red

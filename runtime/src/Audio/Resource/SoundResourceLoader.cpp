@@ -4,24 +4,14 @@
 #include "RedEngine/Audio/System/AudioSystem.hpp"
 #include "RedEngine/Core/Debug/Logger/Logger.hpp"
 #include "RedEngine/Core/Engine.hpp"
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/FileUtils.hpp"
 
 #include <filesystem>
 #include <fmod_common.h>
-#include <nlohmann/json.hpp>
 
 namespace red
 {
-SoundResourceLoader::SoundResourceLoader(World* world) : ResourceLoader(ResourceType::SPRITE, world)
-{
-}
-
-SoundResourceLoader::~SoundResourceLoader()
-{
-}
-
-bool SoundResourceLoader::InitResource(std::shared_ptr<SoundResource>& resource, const Path& /*path*/, nlohmann::json jsonContent)
+bool SoundResourceLoader::InitResource(std::shared_ptr<SoundResource>& resource, const Path& /*path*/, const Json& jsonContent)
 {
     FMOD::System* fmodSystem = nullptr;  // m_world->GetSystem<AudioSystem>()->GetFmodSystem();
 
@@ -43,7 +33,7 @@ bool SoundResourceLoader::InitResource(std::shared_ptr<SoundResource>& resource,
 
 void SoundResourceLoader::FinalizeResource(std::shared_ptr<SoundResource> resource)
 {
-    resource->SetLoadState(LoadState::STATE_RELEASED);
+    resource->SetStatus(ResourceStatus::Released);
     FmodUtils::FmodCheck(resource->GetSound()->release(), "Error releasing sound");
 }
 

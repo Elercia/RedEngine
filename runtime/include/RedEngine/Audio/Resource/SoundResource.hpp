@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RedEngine/Resources/Resource.hpp"
+#include "RedEngine/Resources/ResourceLoader.hpp"
 
 namespace FMOD
 {
@@ -9,12 +9,10 @@ class Sound;
 
 namespace red
 {
-class SoundResource : public IResource
+class SoundResource : public Resource
 {
 public:
-    RED_RESOURCE(ResourceType::SOUND, L"sound");
-
-    SoundResource(const Path& path);
+    SoundResource(const ResourceId& path);
     ~SoundResource();
 
     FMOD::Sound* GetSound();
@@ -23,4 +21,5 @@ public:
 private:
     FMOD::Sound* m_sound;
 };
+RED_RESOURCE(SoundResource)
 }  // namespace red

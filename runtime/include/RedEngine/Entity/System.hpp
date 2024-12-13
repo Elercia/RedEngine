@@ -23,6 +23,8 @@ public:
 class BaseSystem
 {
 public:
+    virtual ~BaseSystem() = default;
+    
     virtual void Update() = 0;
     virtual BaseQuery* GetQuery() = 0;
     World* m_world;

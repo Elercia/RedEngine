@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RedEngine/Audio/AudioEvent.hpp"
+#include "RedEngine/Resources/ResourceLoader.hpp"
 
 #include <memory>
 
@@ -26,7 +27,7 @@ struct AudioSource
 
     SoundDesc m_desc;
 
-    std::shared_ptr<SoundResource> m_sound = nullptr;
+    ResourceHolder<SoundResource> m_sound = nullptr;
     FMOD::Channel* m_currentChannel = nullptr;
 
     bool m_needStart = false;

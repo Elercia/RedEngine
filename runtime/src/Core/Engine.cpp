@@ -25,7 +25,6 @@
 #include "RedEngine/Physics/Components/PhysicsWorld.hpp"
 #include "RedEngine/Physics/System/PhysicsSystem.hpp"
 #include "RedEngine/Rendering/Renderer.hpp"
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/Random.hpp"
 #include "RedEngine/Utils/SystemInfo.hpp"
 

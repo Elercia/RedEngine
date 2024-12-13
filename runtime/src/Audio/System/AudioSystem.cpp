@@ -40,7 +40,7 @@ void UpdateAudioSourceSystem::Update()
         auto audioSource = std::get<AudioSource*>(sourceTuple);
         auto resource = audioSource->m_sound;
 
-        if (resource->GetLoadState() != LoadState::STATE_LOADED)
+        if (resource->GetStatus() != ResourceStatus::Loaded)
         {
             continue;
         }

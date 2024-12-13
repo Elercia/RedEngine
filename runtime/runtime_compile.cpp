@@ -75,8 +75,7 @@
 #include "RedEngine/Rendering/Color.hpp"
 #include "RedEngine/Rendering/Renderer.hpp"
 
-#include "RedEngine/Resources/Resource.hpp"
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
+#include "RedEngine/Resources/ResourceModule.hpp"
 #include "RedEngine/Resources/ResourceLoader.hpp"
 
 #include "RedEngine/Thread/ExecutionGraph.hpp"
@@ -148,8 +147,6 @@
 
 #include "Rendering/Renderer.cpp"
 
-#include "Resources/Resource.cpp"
-#include "Resources/ResourceHolderComponent.cpp"
 #include "Resources/ResourceLoader.cpp"
 
 #include "Thread/ExecutionGraph.cpp"

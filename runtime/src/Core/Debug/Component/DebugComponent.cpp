@@ -4,7 +4,6 @@
 
 #include "RedEngine/Core/Debug/DebugDraw/PhysicsDebugDraw.hpp"
 #include "RedEngine/Entity/Entity.hpp"
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
 
 namespace red
 {

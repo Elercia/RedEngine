@@ -10,7 +10,6 @@
 #include "RedEngine/Core/Time/Time.hpp"
 #include "RedEngine/Entity/World.hpp"
 #include "RedEngine/Entity/Transform.hpp"
-#include "RedEngine/Resources/ResourceHolderComponent.hpp"
 #include "RedEngine/Utils/StringUtils.hpp"
 
 #include <SDL2/SDL_clipboard.h>

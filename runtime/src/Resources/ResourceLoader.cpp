@@ -1,20 +1,25 @@
 #include "RedEngine/Resources/ResourceLoader.hpp"
 
-#include "RedEngine/Resources/ResourceModule.hpp"
-
 namespace red
 {
-IResourceLoader::IResourceLoader(ResourceType resourceType, World* world) : m_resourceType(resourceType), m_world(world)
+Resource::Resource(const ResourceId& id)
+    : m_id(id)
+    , m_satus(ResourceStatus::NotLoaded)
 {
 }
 
-IResourceLoader::~IResourceLoader()
+ResourceStatus Resource::GetStatus() const
 {
+    return m_satus;
 }
 
-ResourceType IResourceLoader::GetResourceType() const
+void Resource::SetStatus(ResourceStatus status)
 {
-    return m_resourceType;
+    m_satus = status;
 }
 
-}  // namespace red
+const ResourceId& Resource::GetResourceId() const
+{
+    return m_id;
+}
+}

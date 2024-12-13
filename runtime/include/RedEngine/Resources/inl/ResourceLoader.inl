@@ -1,106 +1,80 @@
+#include "../ResourceLoader.hpp"
+
 namespace red
 {
-template <typename Type>
-ResourceLoader<Type>::ResourceLoader(ResourceType resourceType, World* world) : IResourceLoader(resourceType, world)
+template <typename ResourceType>
+ResourceHolder<ResourceType> ResourceListHolderComponent<ResourceType>::GetFromCache(const ResourceId& path)
 {
-}
-
-template <typename Type>
-std::shared_ptr<Type> ResourceLoader<Type>::GetFromCache(const Path& path)
-{
-    auto it = m_loadedResources.find(path);
-
-    if (it != m_loadedResources.end())
+    for(auto holder : m_resources)
     {
-        return it->second;
+        if(holder->GetResourceId() == path)
+            return holder;
     }
 
     return nullptr;
 }
 
-template <typename Type>
-std::shared_ptr<Type> ResourceLoader<Type>::GetOrCreateFromCache(const Path& path)
+template <typename ResourceType>
+ResourceHolder<ResourceType> ResourceListHolderComponent<ResourceType>::GetOrCreateFromCache(const ResourceId& path)
 {
-    auto ptr = GetFromCache(path);
+    auto holder = GetFromCache(path);
 
-    if (ptr != nullptr)
-        return ptr;
+    if(holder == nullptr)
+    {
+        holder = std::make_shared<ResourceType>(path);
+        m_resources.push_back(holder);
+    }
 
-    auto newptr = std::make_shared<Type>(path);
-
-    m_loadedResources.insert({path, newptr});
-
-    return newptr;
+    return holder;
 }
 
-template <typename Type>
-void ResourceLoader<Type>::FinalizeUnusedResources()
+template <typename ResourceType, typename ... OtherQueries>
+void ResourceLoader<ResourceType, OtherQueries...>::Update()
 {
-    for (auto resourceIt = m_loadedResources.begin(); resourceIt != m_loadedResources.end();)
-    {
-        auto& resource = resourceIt->second;
+    auto resourceHolder = std::get<ResourceListHolderComponent<ResourceType>*>(this->m_query.GetSingletonComponents());
+    auto requestComponents = this->m_query.GetEntitiesComponents();
 
-        if (resource.use_count() == 1)
+    for(auto holder : resourceHolder->m_resources)
+    {
+        if(holder.use_count() == 1)
         {
-            FinalizeResource(resource);
-
-            resourceIt = m_loadedResources.erase(resourceIt);
+            FinalizeResource(holder, std::get<OtherQueries*>(this->m_query.GetSingletonComponents())...);
         }
-
-        resourceIt++;
     }
-}
 
-template <typename Type>
-void ResourceLoader<Type>::FinalizeAllResources()
-{
-    for (auto resourceIt = m_loadedResources.begin(); resourceIt != m_loadedResources.end(); resourceIt++)
+    for(auto& requestTuple : requestComponents)
     {
-        auto& resource = resourceIt->second;
+        const auto* requestComp = std::get<ResourceRequestComponent*>(requestTuple);
 
-        FinalizeResource(resource);
+        auto& resourceRequests = requestComp->m_requests; // TODO request can be for another loader
+
+        for( auto requestResourceId : resourceRequests)
+        {
+            ResourceHolder<ResourceType> cachedResource = resourceHolder->GetOrCreateFromCache(requestResourceId);
+
+            if (cachedResource->GetStatus() == ResourceStatus::Loaded ||cachedResource->GetStatus() == ResourceStatus::Error)
+                continue;
+
+            cachedResource->SetStatus(ResourceStatus::Error);
+
+            if (!requestResourceId.Exist() || requestResourceId.IsDirectory())
+            {
+                RED_LOG_WARNING("Cannot load resource of type {} from path {}", TypeInfo<ResourceType>().name,
+                                requestResourceId.GetAscciiPath());
+                continue;
+            }
+
+            auto fileContent = ReadFile(requestResourceId);
+            auto parsedJson = Json::parse(fileContent.begin(), fileContent.end(), nullptr, false, true);
+
+            if (InitResource(cachedResource, requestResourceId, parsedJson, std::get<OtherQueries*>(this->m_query.GetSingletonComponents())...))// TODO pass other queries
+            {
+                cachedResource->SetStatus(ResourceStatus::Loaded);
+            }
+
+            RED_LOG_TRACE("Creating {} from path {}", TypeInfo<ResourceType>().name, requestResourceId.GetAscciiPath());
+        }
+        //TODO How to remove the request component
     }
 }
-
-template <typename Type>
-std::shared_ptr<red::IResource> ResourceLoader<Type>::LoadAbstractResource(const Path& path)
-{
-    return LoadResource(path);
 }
-
-template <typename Type>
-std::shared_ptr<Type> ResourceLoader<Type>::LoadResource(const Path& path)
-{
-    using json = nlohmann::json;
-
-    Path activePath = path;
-    activePath.Append(L".");
-    activePath.Append(Type::GetFileExtension());
-
-    auto cachedResource = GetOrCreateFromCache(activePath);
-
-    if (cachedResource->GetLoadState() != LoadState::STATE_NOT_LOADED)
-        return cachedResource;
-
-    cachedResource->SetLoadState(LoadState::STATE_ERROR);
-
-    if (!activePath.Exist() || activePath.IsDirectory())
-    {
-        RED_LOG_WARNING("Cannot load resource of type {} from path {}", TypeInfo<Type>().name,
-                        activePath.GetAscciiPath());
-        return cachedResource;
-    }
-
-    auto parsedJson = json::parse(ReadFile(activePath), nullptr, false, true);
-
-    if (InitResource(cachedResource, activePath, parsedJson))
-    {
-        cachedResource->SetLoadState(LoadState::STATE_LOADED);
-    }
-
-    RED_LOG_TRACE("Creating {} from path {}", TypeInfo<Type>().name, activePath.GetAscciiPath());
-
-    return cachedResource;
-}
-
-}  // namespace red

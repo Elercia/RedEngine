@@ -1,65 +1,80 @@
 #pragma once
 
-#include "RedEngine/Core/Container/Map.hpp"
-#include "RedEngine/Filesystem/Path.hpp"
-#include "RedEngine/Resources/Resource.hpp"
-#include "RedEngine/Utils/FileUtils.hpp"
-#include "RedEngine/Utils/TypesInfo.hpp"
-#include "RedEngine/Core/Debug/Logger/Logger.hpp"
+#include "RedEngine/Resources/ResourceModule.hpp"
 
-#include <memory>
+#include "RedEngine/Entity/System.hpp"
+#include "RedEngine/Filesystem/Path.hpp"
+#include "RedEngine/Core/Container/Array.hpp"
+#include "RedEngine/Entity/ComponentRegistry.hpp"
+#include "RedEngine/Utils/FileUtils.hpp"
+
 #include <nlohmann/json.hpp>
-#include "RedEngine/Core/Container/String.hpp"
 
 namespace red
 {
-class World;
+using ResourceId = Path;
+using Json = nlohmann::json;
 
-class IResourceLoader
+enum class ResourceStatus : uint8
 {
-public:
-    IResourceLoader(ResourceType resourceType, World* world);
-    virtual ~IResourceLoader();
-
-    ResourceType GetResourceType() const;
-
-    virtual std::shared_ptr<IResource> LoadAbstractResource(const Path& path) = 0;
-
-    virtual void FinalizeUnusedResources() = 0;
-    virtual void FinalizeAllResources() = 0;
-
-protected:
-    ResourceType m_resourceType;
-    World* m_world;
+    NotLoaded,
+    Loaded,
+    Error,
+    Released
 };
 
-template <typename Type>
-class ResourceLoader : public IResourceLoader
+class Resource : public red::Uncopyable
 {
-    static_assert(std::is_base_of_v<IResource, Type>, "ResourceLoader template must inherit from Resource");
-
 public:
-    using ThisType = Type;
+    explicit Resource(const ResourceId& id);
 
-    ResourceLoader(ResourceType resourceType, World* world);
-    virtual ~ResourceLoader() = default;
+    virtual ~Resource() = default;
+    Resource(Resource&& other) = default;
+    Resource& operator=(Resource&& other) = default;
 
-    std::shared_ptr<IResource> LoadAbstractResource(const Path& path) override;
-    std::shared_ptr<Type> LoadResource(const Path& path);
+    ResourceStatus GetStatus() const;
+    void SetStatus(ResourceStatus status);
 
-    virtual void FinalizeResource(std::shared_ptr<Type> resource) = 0;
-    virtual bool InitResource(std::shared_ptr<Type>& resource, const Path& path, nlohmann::json jsonContent) = 0;
+    const ResourceId& GetResourceId() const;
 
-    std::shared_ptr<Type> GetFromCache(const Path& path);
-    std::shared_ptr<Type> GetOrCreateFromCache(const Path& path);
-
-    virtual void FinalizeUnusedResources() override;
-    virtual void FinalizeAllResources() override;
-
-protected:
-    Map<Path, std::shared_ptr<Type>> m_loadedResources;
+private:
+    ResourceId m_id;
+    ResourceStatus m_satus;
 };
 
-}  // namespace red
+class GenericResourceHandle
+{
+    
+};
+
+template <typename T>
+class ResourceHandle : public GenericResourceHandle
+{
+};
+
+class IResourceManager : Uncopyable, Unmovable
+{
+public:
+    IResourceManager() = default;
+    virtual ~IResourceManager() = default;
+
+    virtual void Init();
+    virtual void Finalize();
+
+    virtual GenericResourceHandle GetResource(const ResourceId& id) = 0; // Immediate load
+    virtual GenericResourceHandle LoadResource(const ResourceId& id) = 0; // Push a load command
+};
+
+template <typename ResourceType>
+class ResourceManager : public IResourceManager
+{
+public:
+    ResourceManager() = default;
+    virtual ~ResourceManager() = default;
+
+    virtual GenericResourceHandle LoadResource(const ResourceId& id) override;
+};
+
+}
 
 #include "inl/ResourceLoader.inl"
