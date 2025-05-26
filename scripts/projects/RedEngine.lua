@@ -39,6 +39,8 @@ elseif os.istarget("windows") then
 	table.insert(availablePlatforms, "Win64")
 	table.insert(libsToLink, "shell32")
 	table.insert(libsToLink, "Advapi32")
+elseif os.istarget("macosx") then
+	table.insert(availablePlatforms, "Macos64")
 end
 
 function RedDefaultProjectOptions()
@@ -140,8 +142,6 @@ function RedDefaultProjectOptions()
 		"FMT_EXCEPTIONS=0",
 	}
 
-	buildoptions { "/source-charset:utf-8 /execution-charset:utf-8" }
-
 end
 
 workspace "RedEngine"
@@ -181,6 +181,14 @@ workspace "RedEngine"
 	filter { "platforms:Linux64" }
 		system "linux"
 		architecture "x64"
+	filter {}
+
+	filter { "platforms:Macos64" }
+		system "macosx"
+		architecture "ARM64"
+
+		toolset "clang" 
+		buildoptions{ "-Wno-register" }
 	filter {}
 
 	location(projectsFilesLocation)

@@ -125,9 +125,9 @@ function ExternalLibs(Name, IsStaticLib, IncludeDirectory)
 		symbols "Off"
 	filter {}
 
-	--filter { "toolset:msc" }
+	filter { "toolset:msc" }
 		buildoptions { "/source-charset:utf-8 /execution-charset:utf-8" }
-	--filter {}
+	filter {}
 	
 
 end
