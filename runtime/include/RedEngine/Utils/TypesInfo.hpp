@@ -11,11 +11,11 @@ using TypeTraitsId = uint32;
 
 struct TypeTraits
 {
-    StringView name;
-    TypeTraitsId typeId;
-    uint64 size;
-    bool triviallyConstructible;
-    bool triviallyDestructible;
+    StringView name = "invalid";
+    TypeTraitsId typeId = (TypeTraitsId)-1;
+    uint64 size = 0;
+    bool triviallyConstructible = false;
+    bool triviallyDestructible = false;
 
     constexpr bool operator==(const TypeTraits& other) const
     {
@@ -30,7 +30,7 @@ struct TypeTraits
 
 static_assert(std::is_trivially_destructible<TypeTraits>::value, "TypeTraits must be trivially_destructible");
 
-constexpr TypeTraits EmptyTypeTraits{"invalid", (uint32) -1};
+constexpr TypeTraits EmptyTypeTraits;
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define RED_FUNCNAME              __FUNCSIG__
