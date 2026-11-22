@@ -126,9 +126,9 @@ constexpr auto FilterComponentTypeTraits()
         [](auto... ts)
         {
             return std::tuple_cat(
-                std::conditional_t < std::is_base_of<FilterType, std::decay<decltype(ts)>::type>::value &&
-                    (IncludeSingletons || ComponentTraits<std::decay<decltype(ts)>::type::Type>::IsSingleton == false),
-                Tuple<std::decay<decltype(ts)>::type>, Tuple < >> {}...);
+                std::conditional_t < std::is_base_of<FilterType,typename std::decay<decltype(ts)>::type>::value &&
+                    (IncludeSingletons || ComponentTraits<typename std::decay<decltype(ts)>::type::Type>::IsSingleton == false),
+                Tuple<typename std::decay<decltype(ts)>::type>, Tuple < >> {}...);
         },
         std::tuple<QueriesTypes...>());
 }
@@ -148,9 +148,9 @@ constexpr auto GetIncludedComponentTypeTuple()
                               [](auto&&... compQuery)
                               {
                                   return Tuple<std::conditional_t<
-                                      std::is_base_of_v<ReadCompQuery, std::decay<decltype(compQuery)>::type>,
-                                      std::add_pointer_t<std::add_const_t<std::decay<decltype(compQuery)>::type::Type>>,
-                                      std::add_pointer<std::decay<decltype(compQuery)>::type::Type>::type>...>();
+                                      std::is_base_of_v<ReadCompQuery, typename std::decay<decltype(compQuery)>::type>,
+                                      typename std::add_pointer_t<typename std::add_const_t<typename std::decay<decltype(compQuery)>::type::Type>>,
+                                      typename std::add_pointer<typename std::decay<decltype(compQuery)>::type::Type>::type>...>();
                               },
                               FilterComponentTypeTraits<IncludeInQueryResultCompQuery, false, QueriesTypes...>()));
 }
@@ -162,8 +162,8 @@ constexpr auto FilterSingletonTypeTraits()
         [](auto... compQuery)
         {
             return std::tuple_cat(
-                std::conditional_t<ComponentTraits<std::decay<decltype(compQuery)>::type::Type>::IsSingleton,
-                                   Tuple<std::decay<decltype(compQuery)>::type>, Tuple<>>{}...);
+                std::conditional_t<ComponentTraits<typename std::decay<decltype(compQuery)>::type::Type>::IsSingleton,
+                                   Tuple<typename std::decay<decltype(compQuery)>::type>, Tuple<>>{}...);
         },
         std::tuple<QueriesTypes...>());
 }
@@ -175,9 +175,9 @@ constexpr auto GetQuerySingletonComponent()
         [](auto&&... compQuery)
         {
             return Tuple<
-                std::conditional_t<std::is_base_of_v<ReadCompQuery, std::decay<decltype(compQuery)>::type>,
-                                   std::add_pointer_t<std::add_const_t<std::decay<decltype(compQuery)>::type::Type>>,
-                                   std::add_pointer<std::decay<decltype(compQuery)>::type::Type>::type>...>();
+                std::conditional_t<std::is_base_of_v<ReadCompQuery, typename std::decay<decltype(compQuery)>::type>,
+                                   typename std::add_pointer_t<typename std::add_const_t<typename std::decay<decltype(compQuery)>::type::Type>>,
+                                   typename std::add_pointer<typename std::decay<decltype(compQuery)>::type::Type>::type>...>();
         },
         FilterSingletonTypeTraits<QueriesTypes...>());
 }

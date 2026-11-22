@@ -4,6 +4,7 @@
 #include "RedEngine/Audio/Component/AudioSource.hpp"
 #include "RedEngine/Audio/Component/AudioSubSystem.hpp"
 #include "RedEngine/Entity/System.hpp"
+#include "RedEngine/Entity/SystemQuery.hpp"
 #include "RedEngine/Entity/Transform.hpp"
 
 #include <fmod.hpp>

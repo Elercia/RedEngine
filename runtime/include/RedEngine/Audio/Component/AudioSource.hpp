@@ -27,7 +27,7 @@ struct AudioSource
 
     SoundDesc m_desc;
 
-    ResourceHolder<SoundResource> m_sound = nullptr;
+    //ResourceHolder<SoundResource> m_sound = nullptr;
     FMOD::Channel* m_currentChannel = nullptr;
 
     bool m_needStart = false;

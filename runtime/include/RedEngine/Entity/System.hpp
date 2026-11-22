@@ -1,13 +1,14 @@
 #pragma once
 
 #include "RedEngine/Entity/Entity.hpp"
-#include "RedEngine/Entity/SystemQuery.hpp"
+//#include "RedEngine/Entity/SystemQuery.hpp"
 #include "RedEngine/Utils/Tuple.hpp"
 #include "RedEngine/Utils/TypesInfo.hpp"
 
 namespace red
 {
 class World;
+struct BaseQuery;
 
 // TODO Query ?
 class SystemInitializer
@@ -35,7 +36,7 @@ template <typename QueryType>
 class System : public BaseSystem
 {
 public:
-    static_assert(std::is_base_of<BaseQuery, QueryType>::value, "Not a query type");
+    //static_assert(std::is_base_of<BaseQuery, QueryType>::value, "Not a query type");
 
     QueryType m_query;
 

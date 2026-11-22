@@ -7,6 +7,8 @@
 
 namespace red
 {
+class ExecutionGraph;
+
 class ExecutionNode
 {
     friend class ExecutionGraph;
