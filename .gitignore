@@ -199,3 +199,7 @@ templates/*/RESOURCES/ENGINE_RESOURCES
 # Code Coverage 
 CoverageReport*/
 LastCoverageResults.log
+
+
+# Macos 
+**/.DS_Store
