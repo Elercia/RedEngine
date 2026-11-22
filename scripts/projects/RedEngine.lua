@@ -54,7 +54,7 @@ function RedDefaultProjectOptions()
 		exceptionhandling("Off")
 	end
 	warnings("Extra")
-	flags("NoPCH")
+	enablepch("Off")
 	staticruntime("Off")
 	editandcontinue("Off")
 
@@ -65,10 +65,6 @@ function RedDefaultProjectOptions()
 	filter { "options:asan", "configurations:Debug or ReleaseWithDebugInfo" }
 		sanitize { "Address" }
 		defines{"_DISABLE_VECTOR_ANNOTATION", "_DISABLE_STRING_ANNOTATION"}
-	filter {}
-
-	filter{ "platforms:Linux64" }
-  		buildoptions {}
 	filter {}
 
 	filter { "toolset:msc" }
@@ -96,6 +92,19 @@ function RedDefaultProjectOptions()
 		defines
 		{
 			"RED_LINUX"
+		}
+
+		links
+		{
+			"pthread"
+		}
+	filter {}
+
+	filter { "platforms:Macos64" }
+
+		defines
+		{
+			"RED_MACOS"
 		}
 
 		links
@@ -159,10 +168,7 @@ workspace "RedEngine"
 		availablePlatforms
 	}
 
-	flags
-	{
-		"MultiProcessorCompile",
-	}
+	multiprocessorcompile("On")
 
 	defines
 	{
@@ -185,7 +191,7 @@ workspace "RedEngine"
 
 	filter { "platforms:Macos64" }
 		system "macosx"
-		architecture "ARM64"
+		architecture "AARCH64"
 
 		toolset "clang" 
 		buildoptions{ "-Wno-register" }
